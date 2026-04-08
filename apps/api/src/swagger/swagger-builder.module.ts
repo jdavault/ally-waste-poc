@@ -16,7 +16,7 @@ export class SwaggerBuilderModule {
       title = 'Ally Waste API',
       description = 'Valet trash and recycling logistics platform API',
       version = '1.0',
-      path = 'docs',
+      path = 'spec',
     } = options;
 
     const config = new DocumentBuilder()

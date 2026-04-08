@@ -19,7 +19,7 @@ async function bootstrap() {
     title: 'Ally Waste API',
     description: 'Valet trash and recycling logistics platform API',
     version: '1.0',
-    path: 'docs',
+    path: 'spec',
   });
 
   const port = process.env.PORT ?? 3000;
@@ -27,6 +27,6 @@ async function bootstrap() {
 
   console.log(`API running on: http://localhost:${port}/api`);
   console.log(`Health check:   http://localhost:${port}/api/health`);
-  console.log(`Swagger docs:   http://localhost:${port}/docs`);
+  console.log(`Swagger docs:   http://localhost:${port}/spec`);
 }
 bootstrap();
