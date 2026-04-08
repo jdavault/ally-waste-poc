@@ -36,7 +36,20 @@
 - Accent Green `#00D084` — hover states, success indicators
 - Soft Gray `#F1F3F5` — section backgrounds
 - Text Dark `#32373C` — body text
-- Logo and assets in `asset/images/`
+
+### Assets (`asset/images/`)
+- `logo.png` / `logo-light.svg` — official Ally Waste logo
+- `favicon-32x32.png` / `favicon-192x192.png` — site favicons
+- `app-screenshot.png` — reference image for the mobile app dashboard
+- `service-map.png` — service area visualization
+- `senior-living.png` / `college-residents.png` — industry segment imagery
+
+### Mobile Reference (`asset/images/mobile-reference/`)
+- `mobile-contact-form-1.jpeg` / `mobile-contact-form-2.jpeg` — full contact/support form flow
+- `mobile-app-settings.jpeg` — app version, language, and support links
+- `mobile-service-info.jpeg` — "Reliable and Consistent Service" value prop screen
+- `mobile-resident-guidelines.jpeg` — valet process and pickup rules
+- `mobile-job-listings.jpeg` — valet trash job search screen
 
 ## Timeline
 
