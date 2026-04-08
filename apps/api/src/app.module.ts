@@ -10,9 +10,10 @@ import { RoutesModule } from './modules/routes/routes.module';
 import { TrackingModule } from './modules/tracking/tracking.module';
 import { SyncModule } from './modules/sync/sync.module';
 import { EventsModule } from './modules/events/events.module';
+import { HealthModule } from './modules/health/health.module';
 
 @Module({
-  imports: [PropertiesModule, BuildingsModule, UnitsModule, SchedulesModule, WorkersModule, RoutesModule, TrackingModule, SyncModule, EventsModule],
+  imports: [HealthModule, PropertiesModule, BuildingsModule, UnitsModule, SchedulesModule, WorkersModule, RoutesModule, TrackingModule, SyncModule, EventsModule],
   controllers: [AppController],
   providers: [AppService],
 })
