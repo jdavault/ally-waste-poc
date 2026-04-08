@@ -4,31 +4,40 @@
 
 ## What Happened This Session
 
-- Reviewed the full POC plan (`ally-waste-interview-poc-plan.md`)
 - Initialized git repo + npm workspaces monorepo
 - Created `@ally-waste/shared-types` with all domain models, enums, DTOs, offline types
-- Scaffolded NestJS API with 9 domain modules (properties, buildings, units, schedules, workers, routes, tracking, sync, events)
-- Scaffolded admin-web with Vite + React + Bootstrap + TanStack Query + Zustand + React Router
-- Scaffolded worker-mobile with Expo + configured metro.config.js for monorepo
-- Created generic `IRepository<T>` interface for repository abstraction
-- Configured CORS, validation pipe, `/api` prefix on NestJS
-- Fixed Vite TS compat issues (`erasableSyntaxOnly`, `verbatimModuleSyntax`)
-- Verified all 3 apps start and shared-types imports work
-- Reviewed Ally Waste brand assets and color palette
-- Reviewed their current mobile app screenshots (basic, v1.0.7)
+- Scaffolded NestJS API with 9 domain modules + health endpoint + Swagger at `/spec`
+- Scaffolded admin-web with Vite + React + Bootstrap + TanStack Query + Zustand
+- Scaffolded worker-mobile with Expo + dev-client for iOS simulator
+- Downloaded iOS 26.4 simulator runtime and completed first native build
+- All 3 apps verified running:
+  - API: `http://localhost:3000/api` + `/api/health` + `/spec`
+  - Admin: `http://localhost:5173`
+  - Mobile: iOS simulator via `npx expo run:ios`
 - Updated `.ai/` memory files for this project
-- Initial commit: `7882e2d`
+- Pushed to `https://github.com/jdavault/ally-waste-poc`
 
 ## What's Done
 
 - Monorepo structure with npm workspaces
 - `packages/shared-types/` — complete domain type system
-- `apps/api/` — NestJS with 9 module shells + repository interface
-- `apps/admin-web/` — Vite + React scaffolded with all deps
-- `apps/worker-mobile/` — Expo scaffolded with all deps + metro config
+- `apps/api/` — NestJS with 10 modules (9 domain + health), Swagger, CORS, validation pipe
+- `apps/admin-web/` — Vite + React with all deps, shared-types verified
+- `apps/worker-mobile/` — Expo with dev-client, iOS native build done, shared-types verified in simulator
 - Brand assets in `asset/images/` (logo, favicons, screenshots, mobile reference)
-- Color palette documented in `ally-waste-color-pallet.md`
-- All typechecks pass, cross-package imports verified
+- Color palette: Navy `#101A30`, Green `#7EB141`, Accent `#00D084`, Gray `#F1F3F5`, Text `#32373C`
+- Remote: `origin -> https://github.com/jdavault/ally-waste-poc`
+
+## Dev Workflow (3 terminals)
+
+```
+npm run dev:api      # NestJS on :3000
+npm run dev:admin    # Vite on :5173
+npm run dev:mobile   # Expo dev-client (connects to iOS simulator)
+```
+
+First time mobile: `cd apps/worker-mobile && npx expo run:ios`
+After that: `npm run dev:mobile` from root
 
 ## What's NOT Done Yet
 
@@ -51,7 +60,7 @@
 
 1. In-memory repositories for all 9 modules with seed data
    - 2 properties, 4 buildings, ~20 units, 3 workers, 2 routes with stops
-2. All REST endpoints from plan:
+2. All REST endpoints:
    - Properties: GET /properties, GET /properties/:id
    - Buildings: GET /properties/:id/buildings, GET /buildings/:id/units
    - Workers: GET /workers, GET /workers/:id/today-route
@@ -61,7 +70,8 @@
    - Tracking: POST /workers/:id/location-ping
    - Events: GET /routes/:id/events
 3. DTO validation with class-validator
-4. Event logging on every mutation
+4. Swagger decorators on all endpoints
+5. Event logging on every mutation
 
 ### Afternoon Priority: Admin Web (3-4 hours)
 
@@ -76,7 +86,7 @@
 
 ### Evening Priority: Worker Mobile (2 hours)
 
-1. Navigation setup
+1. Navigation setup (Expo Router or React Navigation)
 2. Worker select screen
 3. Today's Route screen
 4. Stop list + Stop detail with complete/miss/issue buttons
@@ -84,14 +94,15 @@
 
 ## Decisions Made
 
-- npm workspaces (not Turborepo) — simpler, sufficient for 3 apps + 1 package
+- npm workspaces (not Turborepo)
 - Modular monolith — clean module boundaries, one deployable
-- In-memory repos behind `IRepository<T>` — Postgres swap path without blocking demo
+- In-memory repos behind `IRepository<T>`
+- expo-dev-client for local iOS simulator dev (not Expo Go)
+- Swagger at `/spec`, API prefix at `/api`
 - Standard TS enums in shared-types (disabled `erasableSyntaxOnly` in Vite tsconfig)
-- `/api` prefix on all NestJS routes
 - CORS enabled globally for dev
 - Bootstrap (not Tailwind) per plan spec
 
 ## Resume Context
 
-Monorepo is fully scaffolded and committed. All 9 NestJS modules exist as empty shells. Tomorrow is the big build day — fill in the API with real endpoints and seed data, then build admin dashboard and worker app screens. The API should be the morning focus since both frontend apps depend on it.
+Everything is scaffolded, verified, and pushed. Tomorrow is the big build day — fill in the API with real endpoints and seed data first (both frontends depend on it), then build admin dashboard pages, then worker app screens.
