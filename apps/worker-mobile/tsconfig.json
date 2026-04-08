@@ -1,0 +1,10 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "paths": {
+      "@ally-waste/shared-types": ["../../packages/shared-types/src"],
+      "@ally-waste/shared-types/*": ["../../packages/shared-types/src/*"]
+    }
+  }
+}

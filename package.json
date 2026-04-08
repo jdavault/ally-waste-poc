@@ -1,0 +1,17 @@
+{
+  "name": "ally-waste-poc",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:api": "npm run start:dev -w @ally-waste/api",
+    "dev:admin": "npm run dev -w @ally-waste/admin-web",
+    "dev:mobile": "npm run start -w @ally-waste/worker-mobile",
+    "build:api": "npm run build -w @ally-waste/api",
+    "build:admin": "npm run build -w @ally-waste/admin-web",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present"
+  }
+}

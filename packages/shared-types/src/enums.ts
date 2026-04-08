@@ -1,0 +1,54 @@
+export enum RouteStatus {
+  PENDING = 'PENDING',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED',
+}
+
+export enum RouteStopStatus {
+  PENDING = 'PENDING',
+  COMPLETED = 'COMPLETED',
+  MISSED = 'MISSED',
+  ISSUE = 'ISSUE',
+}
+
+export enum IssueCode {
+  NO_ACCESS = 'NO_ACCESS',
+  CONTAMINATED = 'CONTAMINATED',
+  OVERWEIGHT = 'OVERWEIGHT',
+  DAMAGED_CONTAINER = 'DAMAGED_CONTAINER',
+  OTHER = 'OTHER',
+}
+
+export enum DayOfWeek {
+  MON = 'MON',
+  TUE = 'TUE',
+  WED = 'WED',
+  THU = 'THU',
+  FRI = 'FRI',
+  SAT = 'SAT',
+  SUN = 'SUN',
+}
+
+export enum VehicleType {
+  TRUCK = 'TRUCK',
+  VAN = 'VAN',
+  CART = 'CART',
+}
+
+export enum EventType {
+  ROUTE_STARTED = 'ROUTE_STARTED',
+  ROUTE_COMPLETED = 'ROUTE_COMPLETED',
+  STOP_COMPLETED = 'STOP_COMPLETED',
+  STOP_MISSED = 'STOP_MISSED',
+  STOP_ISSUE = 'STOP_ISSUE',
+  LOCATION_PING = 'LOCATION_PING',
+  SYNC_BATCH = 'SYNC_BATCH',
+}
+
+export enum EntityType {
+  ROUTE = 'ROUTE',
+  ROUTE_STOP = 'ROUTE_STOP',
+  WORKER = 'WORKER',
+  PROPERTY = 'PROPERTY',
+}
