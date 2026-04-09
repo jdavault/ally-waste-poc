@@ -171,10 +171,11 @@ export default function HomeScreen({ navigation }: any) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F1F3F5',
+    backgroundColor: '#101A30',
   },
   scroll: {
     padding: 20,
+    backgroundColor: '#F1F3F5',
   },
   profileSection: {
     flexDirection: 'row',

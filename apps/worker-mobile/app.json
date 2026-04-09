@@ -13,7 +13,7 @@
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#101A30"
+      "backgroundColor": "#7EB141"
     },
     "ios": {
       "supportsTablet": true,
@@ -22,10 +22,11 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#101A30"
+        "backgroundColor": "#7EB141"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.jdavault01.allywasteworker"
     },
     "web": {
       "favicon": "./assets/favicon.png"

@@ -1,5 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
-import { useMemo } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMemo, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Route, RouteStop, RouteStatus, RouteStopStatus, EventLog, Worker, Property } from '@ally-waste/shared-types';
 import { apiFetch } from '../api/client';
@@ -8,7 +8,16 @@ import { ChevronRight, Clock, MapPin, User, Building2, CheckCircle2, AlertCircle
 
 export default function RouteDetailPage() {
   const { id } = useParams();
+  const queryClient = useQueryClient();
   const liveEvents = useRouteEvents(id);
+
+  // When a WebSocket event arrives, invalidate the stops and route queries
+  // so the stop status badges and progress bar update in real time
+  useEffect(() => {
+    if (liveEvents.length === 0) return;
+    queryClient.invalidateQueries({ queryKey: ['routes', id, 'stops'] });
+    queryClient.invalidateQueries({ queryKey: ['routes', id] });
+  }, [liveEvents.length, id, queryClient]);
 
   const renderEventDetails = (payload: Record<string, unknown>) => {
     const parts: string[] = [];

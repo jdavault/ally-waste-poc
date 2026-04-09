@@ -39,18 +39,20 @@ export class RouteEventsGateway implements OnGatewayInit {
   }
 
   broadcast(event: EventLog): void {
-    // Route-level events: entityId is the routeId
-    // Stop-level events: routeId is embedded in the payload
-    const routeId =
-      event.entityType === EntityType.ROUTE
-        ? event.entityId
-        : (event.payload.routeId as string | undefined);
+    // 1. Identify which per-route room should receive this event
+    let targetRouteId: string | undefined;
 
-    if (routeId) {
-      this.server.to(`route:${routeId}`).emit('route-event', event);
+    if (event.entityType === EntityType.ROUTE) {
+      targetRouteId = event.entityId;
+    } else if (event.payload.routeId) {
+      targetRouteId = event.payload.routeId as string;
     }
 
-    // Global activity feed — admin dashboard live strip
+    if (targetRouteId) {
+      this.server.to(`route:${targetRouteId}`).emit('route-event', event);
+    }
+
+    // 2. Global activity feed — admin dashboard live strip
     this.server.emit('activity', event);
   }
 }

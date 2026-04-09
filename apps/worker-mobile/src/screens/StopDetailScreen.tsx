@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, ActivityIndicator, Alert, TextInput, ScrollView } from 'react-native';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import * as Location from 'expo-location';
 import { apiFetch } from '../api/client';
 import { useOfflineStore } from '../store/offlineStore';
+import { SyncService } from '../offline/syncService';
 import {
   Building,
   Property,
+  Route,
   RouteStop,
+  RouteStopStatus,
   getProximityResult,
 } from '@ally-waste/shared-types';
 import { CheckCircle2, XCircle, AlertTriangle, Camera, MapPin, ChevronLeft, House } from 'lucide-react-native';
@@ -15,6 +18,7 @@ import { CheckCircle2, XCircle, AlertTriangle, Camera, MapPin, ChevronLeft, Hous
 export default function StopDetailScreen({ route, navigation }: any) {
   const { stopId } = route.params;
   const { addAction } = useOfflineStore();
+  const queryClient = useQueryClient();
   const [isProcessing, setIsProcessing] = useState(false);
   const [notes, setNotes] = useState('');
 
@@ -101,10 +105,33 @@ export default function StopDetailScreen({ route, navigation }: any) {
         lat: location?.coords.latitude,
         lng: location?.coords.longitude,
         notes: notes || undefined,
-        issueCode: type === 'REPORT_ISSUE' ? 'GENERAL_ISSUE' : undefined
+        issueCode: type === 'REPORT_ISSUE' ? 'OTHER' : undefined
       });
 
-      // 4. Optimistic UI Update (optional but good)
+      // 3. Optimistic cache update — UI reflects change immediately
+      // regardless of whether sync has completed yet
+      const newStatus =
+        type === 'COMPLETE_STOP' ? RouteStopStatus.COMPLETED
+        : type === 'MISS_STOP' ? RouteStopStatus.MISSED
+        : RouteStopStatus.ISSUE;
+
+      queryClient.setQueryData<RouteStop>(['stops', stopId], old =>
+        old ? { ...old, status: newStatus } : old
+      );
+
+      if (stop?.routeId) {
+        queryClient.setQueryData<{ route: Route; stops: RouteStop[] }>(
+          ['routes', stop.routeId, 'stops'],
+          old => old ? {
+            ...old,
+            stops: old.stops.map(s => s.id === stopId ? { ...s, status: newStatus } : s),
+          } : old
+        );
+      }
+
+      // 4. Best-effort immediate sync — if offline this is a no-op
+      SyncService.syncOutbox().catch(() => {});
+
       Alert.alert('Action Saved', 'Action has been queued and will sync automatically.');
       navigation.goBack();
     } catch (error) {
