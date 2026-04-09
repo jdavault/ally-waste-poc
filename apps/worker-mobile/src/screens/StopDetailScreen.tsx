@@ -33,18 +33,16 @@ export default function StopDetailScreen({ route, navigation }: any) {
         console.warn('Location capture failed', e);
       }
 
-      // 2. Prepare Payload
-      const payload = {
+      // 2. Save to Offline Outbox
+      addAction({
+        type,
         stopId,
         timestamp: new Date().toISOString(),
         lat: location?.coords.latitude,
         lng: location?.coords.longitude,
         notes: notes || undefined,
         issueCode: type === 'REPORT_ISSUE' ? 'GENERAL_ISSUE' : undefined
-      };
-
-      // 3. Save to Offline Outbox
-      addAction(type, payload);
+      });
 
       // 4. Optimistic UI Update (optional but good)
       Alert.alert('Action Saved', 'Action has been queued and will sync automatically.');

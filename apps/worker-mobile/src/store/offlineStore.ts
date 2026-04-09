@@ -7,13 +7,17 @@ export type PendingActionType = 'COMPLETE_STOP' | 'MISS_STOP' | 'REPORT_ISSUE' |
 export interface PendingAction {
   id: string;
   type: PendingActionType;
-  payload: any;
+  stopId: string;
   timestamp: string;
+  lat?: number;
+  lng?: number;
+  notes?: string;
+  issueCode?: string;
 }
 
 interface OfflineState {
   outbox: PendingAction[];
-  addAction: (type: PendingActionType, payload: any) => void;
+  addAction: (action: Omit<PendingAction, 'id'>) => void;
   removeAction: (id: string) => void;
   clearOutbox: () => void;
 }
@@ -22,12 +26,10 @@ export const useOfflineStore = create<OfflineState>()(
   persist(
     (set) => ({
       outbox: [],
-      addAction: (type, payload) => set((state) => ({
+      addAction: (action) => set((state) => ({
         outbox: [...state.outbox, {
+          ...action,
           id: Math.random().toString(36).substring(7),
-          type,
-          payload,
-          timestamp: new Date().toISOString()
         }]
       })),
       removeAction: (id) => set((state) => ({

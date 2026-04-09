@@ -1,5 +1,6 @@
 import NetInfo from '@react-native-community/netinfo';
 import { useOfflineStore } from '../store/offlineStore';
+import { useAuthStore } from '../store/authStore';
 import { apiFetch } from '../api/client';
 
 export class SyncService {
@@ -11,22 +12,21 @@ export class SyncService {
     const state = await NetInfo.fetch();
     if (!state.isConnected) return;
 
-    const { outbox, removeAction } = useOfflineStore.getState();
-    if (outbox.length === 0) return;
+    const { outbox } = useOfflineStore.getState();
+    const { workerId } = useAuthStore.getState();
+    
+    if (outbox.length === 0 || !workerId) return;
 
     this.isSyncing = true;
     console.log(`[SyncService] Starting sync for ${outbox.length} actions...`);
 
     try {
-      // We'll attempt to sync in one batch using the endpoint we built
+      // Send flattened actions + workerId
       const result = await apiFetch<any>('/sync/mobile-actions', {
         method: 'POST',
         body: JSON.stringify({
-          actions: outbox.map(a => ({
-            type: a.type,
-            payload: a.payload,
-            timestamp: a.timestamp
-          }))
+          workerId,
+          actions: outbox.map(({ id: _id, ...action }) => action)
         })
       });
 
