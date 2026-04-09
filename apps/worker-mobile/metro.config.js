@@ -20,16 +20,9 @@ config.resolver.extraNodeModules = {
   '@ally-waste/shared-types': path.resolve(monorepoRoot, 'packages/shared-types'),
 };
 
-// Force ALL react imports to resolve to the mobile app's local react (19.1.0)
-// This prevents expo/RN packages in root node_modules from picking up root react (19.2.4)
-const mobileReactDir = path.resolve(projectRoot, 'node_modules/react');
-
-config.resolver.resolveRequest = (context, moduleName, platform) => {
-  if (moduleName === 'react' || moduleName.startsWith('react/')) {
-    const newContext = { ...context, nodeModulesPaths: [path.resolve(projectRoot, 'node_modules')] };
-    return context.resolveRequest(newContext, moduleName, platform);
-  }
-  return context.resolveRequest(context, moduleName, platform);
-};
+// Note: Previously we had a resolveRequest override to force `react` to the
+// mobile app's local node_modules because admin-web wanted ^19.2.4 and mobile
+// needed 19.1.0 exact. Now that admin-web is pinned to 19.1.0 too, there's a
+// single hoisted react at the monorepo root and no conflict.
 
 module.exports = config;
