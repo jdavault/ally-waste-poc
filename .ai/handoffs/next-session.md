@@ -53,18 +53,24 @@ npm run ios:mobile        # Full Native Build & Install
 - Nuke `ios` folder and run `npx expo prebuild` to force brand asset generation.
 - Refine "Report Issue" flow with photo upload capability (simulated or real GCS upload).
 
-### 4. Data Layer (Optional)
-- Initialize Prisma.
-- Create Postgres schema matching in-memory models.
-- Swap `InMemoryRepository` for `PrismaRepository`.
+### 4. Data Layer (Interview Talking Point)
+- Create Prisma schema matching in-memory models (properties, buildings, units, routes, stops, workers, schedules, pings, events).
+- Document indexing strategy and migration path.
+- Do NOT block on full Postgres integration — schema alone is a strong signal.
+
+### 5. Final Polish (Afternoon)
+- README with architecture overview, local setup, cloud deployment, module boundaries.
+- Architecture diagram (modular monolith, Cloud Run, ALB, GCS).
+- Prepare interview talking points: why modular monolith, why Zustand over Redux, offline-first outbox pattern, Cloud Run + ALB architecture.
 
 ## Decisions Made
 
-- **Port Unification**: Standardized on 8080 across all apps to match Cloud Run.
+- **Port Strategy**: API defaults to 8080 for Cloud Run production, but local `dev:api` runs on port 3000. Mobile API client uses 3000 for local dev, Cloud Run URL via env var for production.
 - **Tailwind Pivot**: Moved away from Bootstrap for a more "senior" modern look.
-- **Metro Config**: Explicitly mapped React/React-Native to root node_modules to solve hook errors.
+- **Metro Config**: Forced React to resolve from mobile app's LOCAL node_modules (19.1.0) to avoid conflict with root's 19.2.4 (from admin-web). react-native resolves from root (hoisted by npm).
 - **Dockerfile Structure**: Preserved workspace nested paths in `dist` to avoid startup failures.
+- **shared-types**: Compiled to dist/ with commonjs output. API resolves via npm workspace symlink (no tsconfig paths needed).
 
 ## Resume Context
 
-The core application is functionally complete. The backend is live and serving traffic. The Admin UI is premium and searchable. The Mobile app handles offline field work. Tomorrow is about production-grade networking and final polishing for the Friday demo.
+The core application is functionally complete. The backend is live and serving traffic. The Admin UI is premium and searchable. The Mobile app handles offline field work. Tomorrow (Day 3) is about production-grade networking and final polishing for the **Friday 4/10 2pm interview**.
