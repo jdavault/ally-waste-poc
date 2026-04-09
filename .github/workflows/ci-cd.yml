@@ -10,7 +10,7 @@ env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   REGION: us-central1
   SERVICE_NAME: ally-waste-api
-  IMAGE_NAME: gcr.io/${{ secrets.GCP_PROJECT_ID }}/ally-waste-api
+  IMAGE_NAME: us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/ally-waste-api/api
 
 jobs:
   ci:
@@ -61,7 +61,7 @@ jobs:
         uses: 'google-github-actions/setup-gcloud@v2'
 
       - name: Authorize Docker
-        run: gcloud auth configure-docker gcr.io
+        run: gcloud auth configure-docker us-central1-docker.pkg.dev
 
       - name: Build and Push Container
         run: |-
