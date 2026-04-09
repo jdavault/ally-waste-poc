@@ -148,6 +148,7 @@ export class RoutesService {
       stopId,
       EventType.STOP_COMPLETED,
       {
+        routeId: stop.routeId,
         lat: dto.lat,
         lng: dto.lng,
         distanceMeters: proximity?.distanceMeters,
@@ -177,7 +178,7 @@ export class RoutesService {
       EntityType.ROUTE_STOP,
       stopId,
       EventType.STOP_MISSED,
-      { reason: dto.reason },
+      { routeId: stop.routeId, reason: dto.reason },
     );
 
     this.checkRouteCompletion(stop.routeId);
@@ -207,6 +208,7 @@ export class RoutesService {
       stopId,
       EventType.STOP_ISSUE,
       {
+        routeId: stop.routeId,
         issueCode: dto.issueCode,
         notes: dto.notes,
         lat: dto.lat,

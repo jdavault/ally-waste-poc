@@ -1,11 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Optional } from '@nestjs/common';
 import { EventLog, EntityType, EventType } from '@ally-waste/shared-types';
 import { EventsRepository } from './events.repository';
+import { RouteEventsGateway } from './events.gateway';
 import { v4 as uuid } from 'uuid';
 
 @Injectable()
 export class EventsService {
-  constructor(private readonly eventsRepository: EventsRepository) {}
+  constructor(
+    private readonly eventsRepository: EventsRepository,
+    @Optional() private readonly gateway: RouteEventsGateway,
+  ) {}
 
   findByRouteId(routeId: string): EventLog[] {
     return this.eventsRepository.findByRouteId(routeId);
@@ -29,6 +33,8 @@ export class EventsService {
       payload,
       createdAt: new Date().toISOString(),
     };
-    return this.eventsRepository.create(event);
+    const saved = this.eventsRepository.create(event);
+    this.gateway?.broadcast(saved);
+    return saved;
   }
 }

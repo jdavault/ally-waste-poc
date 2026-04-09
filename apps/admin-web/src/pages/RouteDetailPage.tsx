@@ -1,11 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
+import { useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Route, RouteStop, RouteStatus, RouteStopStatus, EventLog, Worker, Property } from '@ally-waste/shared-types';
 import { apiFetch } from '../api/client';
+import { useRouteEvents } from '../hooks/useRouteEvents';
 import { ChevronRight, Clock, MapPin, User, Building2, CheckCircle2, AlertCircle, History, Home } from 'lucide-react';
 
 export default function RouteDetailPage() {
   const { id } = useParams();
+  const liveEvents = useRouteEvents(id);
 
   const renderEventDetails = (payload: Record<string, unknown>) => {
     const parts: string[] = [];
@@ -59,6 +62,17 @@ export default function RouteDetailPage() {
     queryFn: () => apiFetch<Worker[]>('/workers'),
     enabled: !!route,
   });
+
+  // Merge REST history with live WebSocket events.
+  // Deduplication by ID handles the fetch-then-subscribe race condition:
+  // an event that arrives via WS during the initial REST fetch won't appear twice.
+  const allEvents = useMemo(() => {
+    const seen = new Set((events ?? []).map(e => e.id));
+    const uniqueLive = liveEvents.filter(e => !seen.has(e.id));
+    return [...uniqueLive, ...(events ?? [])].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
+  }, [events, liveEvents]);
 
   if (loadingRoute || loadingStops || loadingEvents) return <div className="flex items-center justify-center h-full"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-ally-green"></div></div>;
   if (!route) return <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl">Route not found</div>;
@@ -183,12 +197,18 @@ export default function RouteDetailPage() {
 
         {/* Timeline */}
         <section className="bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col">
-          <div className="px-6 py-5 border-b border-slate-100 flex items-center gap-2">
-            <History size={18} className="text-ally-green" />
-            <h3 className="font-black text-ally-navy uppercase tracking-tight">Event Timeline</h3>
+          <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <History size={18} className="text-ally-green" />
+              <h3 className="font-black text-ally-navy uppercase tracking-tight">Event Timeline</h3>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Live</span>
+            </div>
           </div>
           <div className="p-6 flex-1 overflow-y-auto max-h-[600px] space-y-6">
-            {events?.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).map((event) => (
+            {allEvents.map((event) => (
               <div key={event.id} className="relative pl-8 pb-6 border-l-2 border-slate-100 last:pb-0 last:border-l-transparent">
                 <div className={`absolute left-[-9px] top-0 w-4 h-4 rounded-full border-2 border-white shadow-sm ${
                   event.eventType.includes('STARTED') ? 'bg-teal-500' :
@@ -205,7 +225,7 @@ export default function RouteDetailPage() {
                 <p className="text-xs font-medium text-slate-500 mt-1">{renderEventDetails(event.payload)}</p>
               </div>
             ))}
-            {(!events || events.length === 0) && (
+            {allEvents.length === 0 && (
               <p className="text-center text-slate-400 text-sm font-medium py-12">No events logged for this route.</p>
             )}
           </div>
