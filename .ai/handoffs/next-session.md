@@ -1,108 +1,70 @@
 # Next Session Handoff
 
-## Last Session: 2026-04-07 (Session 1 — Scaffold Night)
+## Last Session: 2026-04-08 (Session 2 — Build Day)
 
 ## What Happened This Session
 
-- Initialized git repo + npm workspaces monorepo
-- Created `@ally-waste/shared-types` with all domain models, enums, DTOs, offline types
-- Scaffolded NestJS API with 9 domain modules + health endpoint + Swagger at `/spec`
-- Scaffolded admin-web with Vite + React + Bootstrap + TanStack Query + Zustand
-- Scaffolded worker-mobile with Expo + dev-client for iOS simulator
-- Downloaded iOS 26.4 simulator runtime and completed first native build
-- All 3 apps verified running:
-  - API: `http://localhost:3000/api` + `/api/health` + `/spec`
-  - Admin: `http://localhost:5173`
-  - Mobile: iOS simulator via `npx expo run:ios`
-- Updated `.ai/` memory files for this project
-- Pushed to `https://github.com/jdavault/ally-waste-poc`
+- **API Complete**: All 9 modules implemented with in-memory repositories, seed data, and DTO validation.
+- **Backend Live**: Dockerized the API and deployed to **GCP Cloud Run** via GitHub Actions.
+- **Admin Web Modernized**: Swapped Bootstrap for **Tailwind CSS**. Built full operational dashboard with search, filtering, and pagination.
+- **Worker Mobile Functional**: 
+  - Implemented React Navigation (Login → Home → Route → Stop Detail).
+  - Built **Offline-First Outbox** with automatic/periodic sync logic.
+  - Integrated **GPS capture** on stop actions.
+  - Unified local development port to **8080** for consistency.
+- **DevOps**: Established CI/CD pipeline (Lint → Build → Deploy) and verified Artifact Registry flow.
 
-## What's Done
+## What's Done ✅
 
-- Monorepo structure with npm workspaces
-- `packages/shared-types/` — complete domain type system
-- `apps/api/` — NestJS with 10 modules (9 domain + health), Swagger, CORS, validation pipe
-- `apps/admin-web/` — Vite + React with all deps, shared-types verified
-- `apps/worker-mobile/` — Expo with dev-client, iOS native build done, shared-types verified in simulator
-- Brand assets in `asset/images/` (logo, favicons, screenshots, mobile reference)
-- Color palette: Navy `#101A30`, Green `#7EB141`, Accent `#00D084`, Gray `#F1F3F5`, Text `#32373C`
-- Remote: `origin -> https://github.com/jdavault/ally-waste-poc`
+- **Backend**: Modular NestJS API with event logging and batch sync support.
+- **Frontend**: Responsive Tailwind Admin Dashboard with Sidebar and data-dense views.
+- **Mobile**: Persistent Auth + Offline Store (Zustand + AsyncStorage).
+- **Cloud**: Automated deployment to `https://ally-waste-api-399534668698.us-central1.run.app/spec`.
 
-## Dev Workflow (3 terminals)
+## Dev Workflow (Root Scripts)
 
-```
-npm run dev:api      # NestJS on :3000
-npm run dev:admin    # Vite on :5173
-npm run dev:mobile   # Expo dev-client (connects to iOS simulator)
+```bash
+npm run dev:api           # NestJS on :8080 (Watcher enabled)
+npm run dev:admin         # Vite on :5173
+npm run dev:mobile:clear  # Expo Bundler with cache clear
+npm run ios:mobile        # Full Native Build & Install
 ```
 
-First time mobile: `cd apps/worker-mobile && npx expo run:ios`
-After that: `npm run dev:mobile` from root
+## What's NOT Done Yet ⏳
 
-## What's NOT Done Yet
+- **GCP Networking**: Global Load Balancer, Serverless NEG, and Static IP reservation.
+- **Frontend Deployment**: Host Admin Web on GCS or Firebase Hosting.
+- **Native Assets**: iOS/Android icon and splash screen need a fresh native generation to show custom brand assets.
+- **Persistence**: Prisma schema and Postgres migration (currently in-memory).
 
-- In-memory repository implementations (all modules are empty shells)
-- Seed data
-- REST endpoint implementations
-- Admin dashboard pages (router, layout, dashboard, properties, routes, workers)
-- Worker app screens (navigation, worker select, route view, stop actions)
-- Offline-first outbox pattern
-- GPS capture
-- Docker
-- GitHub Actions CI/CD
-- Cloud Run deployment
-- Prisma schema
-- README
+## Next Session: Thu 4/9 — Networking & Refinement
 
-## Next Session: Wed 4/8 — Build Day (Full Day)
+### 1. GCP Infrastructure (Morning)
+- Reserve Global Static IP.
+- Create Serverless NEG for the Cloud Run backend.
+- Set up Load Balancer with URL Map (`/api/*` -> backend, `/*` -> frontend).
+- Configure SSL certificate.
 
-### Morning Priority: API (3-4 hours)
+### 2. Frontend Cloud Deploy
+- Build `admin-web` for production.
+- Deploy to GCS Bucket or Firebase Hosting behind the Load Balancer.
 
-1. In-memory repositories for all 9 modules with seed data
-   - 2 properties, 4 buildings, ~20 units, 3 workers, 2 routes with stops
-2. All REST endpoints:
-   - Properties: GET /properties, GET /properties/:id
-   - Buildings: GET /properties/:id/buildings, GET /buildings/:id/units
-   - Workers: GET /workers, GET /workers/:id/today-route
-   - Routes: GET /routes, GET /routes/:id, GET /routes/:id/stops, POST /routes, POST /routes/:id/assign-worker
-   - Route Stops: POST /route-stops/:id/complete, /miss, /issue
-   - Sync: POST /sync/mobile-actions
-   - Tracking: POST /workers/:id/location-ping
-   - Events: GET /routes/:id/events
-3. DTO validation with class-validator
-4. Swagger decorators on all endpoints
-5. Event logging on every mutation
+### 3. Mobile "Fresh Start"
+- Nuke `ios` folder and run `npx expo prebuild` to force brand asset generation.
+- Refine "Report Issue" flow with photo upload capability (simulated or real GCS upload).
 
-### Afternoon Priority: Admin Web (3-4 hours)
-
-1. React Router setup with layout (navy sidebar + content area)
-2. Dashboard page (route summary cards, today's activity)
-3. Properties list page
-4. Routes list page with status badges
-5. Route detail page (stop list, progress bar, event timeline)
-6. Workers list page
-7. All pages wired to API with TanStack Query
-8. Ally Waste brand styling with Bootstrap
-
-### Evening Priority: Worker Mobile (2 hours)
-
-1. Navigation setup (Expo Router or React Navigation)
-2. Worker select screen
-3. Today's Route screen
-4. Stop list + Stop detail with complete/miss/issue buttons
-5. Wire to API with TanStack Query
+### 4. Data Layer (Optional)
+- Initialize Prisma.
+- Create Postgres schema matching in-memory models.
+- Swap `InMemoryRepository` for `PrismaRepository`.
 
 ## Decisions Made
 
-- npm workspaces (not Turborepo)
-- Modular monolith — clean module boundaries, one deployable
-- In-memory repos behind `IRepository<T>`
-- expo-dev-client for local iOS simulator dev (not Expo Go)
-- Swagger at `/spec`, API prefix at `/api`
-- Standard TS enums in shared-types (disabled `erasableSyntaxOnly` in Vite tsconfig)
-- CORS enabled globally for dev
-- Bootstrap (not Tailwind) per plan spec
+- **Port Unification**: Standardized on 8080 across all apps to match Cloud Run.
+- **Tailwind Pivot**: Moved away from Bootstrap for a more "senior" modern look.
+- **Metro Config**: Explicitly mapped React/React-Native to root node_modules to solve hook errors.
+- **Dockerfile Structure**: Preserved workspace nested paths in `dist` to avoid startup failures.
 
 ## Resume Context
 
-Everything is scaffolded, verified, and pushed. Tomorrow is the big build day — fill in the API with real endpoints and seed data first (both frontends depend on it), then build admin dashboard pages, then worker app screens.
+The core application is functionally complete. The backend is live and serving traffic. The Admin UI is premium and searchable. The Mobile app handles offline field work. Tomorrow is about production-grade networking and final polishing for the Friday demo.

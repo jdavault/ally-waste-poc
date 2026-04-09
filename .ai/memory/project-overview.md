@@ -21,12 +21,12 @@
 ## Stack
 
 - TypeScript everywhere
-- React + Vite + Bootstrap + TanStack Query + Zustand + React Router (admin)
+- React + Vite + **Tailwind CSS** + TanStack Query + Zustand + React Router (admin)
 - Expo + React Native + Zustand + TanStack Query + AsyncStorage + NetInfo + expo-location (mobile)
 - NestJS + class-validator + class-transformer (API)
 - Docker for backend containerization
-- GitHub Actions CI/CD
-- GCP Cloud Run deployment target
+- GitHub Actions CI/CD (lint → build → deploy)
+- **GCP Cloud Run** (Live Production Backend)
 - Cloudflare as CDN/edge layer
 
 ## Brand
@@ -37,25 +37,26 @@
 - Soft Gray `#F1F3F5` — section backgrounds
 - Text Dark `#32373C` — body text
 
-### Assets (`asset/images/`)
-- `logo.png` / `logo-light.svg` — official Ally Waste logo
-- `favicon-32x32.png` / `favicon-192x192.png` — site favicons
-- `app-screenshot.png` — reference image for the mobile app dashboard
-- `service-map.png` — service area visualization
-- `senior-living.png` / `college-residents.png` — industry segment imagery
+## Project Status (4/8 Close-out)
 
-### Mobile Reference (`asset/images/mobile-reference/`)
-- `mobile-contact-form-1.jpeg` / `mobile-contact-form-2.jpeg` — full contact/support form flow
-- `mobile-app-settings.jpeg` — app version, language, and support links
-- `mobile-service-info.jpeg` — "Reliable and Consistent Service" value prop screen
-- `mobile-resident-guidelines.jpeg` — valet process and pickup rules
-- `mobile-job-listings.jpeg` — valet trash job search screen
+### Completed ✅
+- **Modular API**: 9 modules implemented with in-memory persistence and seed data.
+- **Admin Web**: Modern Tailwind UI with Sidebar, search, filtering, and pagination.
+- **Worker Mobile**: React Navigation flow (Login → Home → Route → Stop).
+- **Offline Sync**: Mobile outbox pattern with automatic and manual sync triggers.
+- **DevOps**: Dockerized backend live on **GCP Cloud Run** via GitHub Actions.
+- **API Unification**: All local development unified on port 8080.
+
+### In Progress / Upcoming ⏳
+- **GCP Networking**: Global Load Balancer, Serverless NEG, and Static IP setup.
+- **Native Assets**: Finalize iOS/Android icon and splash screen generation.
+- **Data Persistence**: Prisma schema and Postgres migration (optional for POC).
 
 ## Timeline
 
 - Tue 4/7: Scaffold monorepo + shared types + module shells (DONE)
-- Wed 4/8: API endpoints + seed data + admin dashboard + worker app screens
-- Thu 4/9: Offline-first mobile + Docker + CI/CD + Cloud Run + Prisma schema
+- Wed 4/8: API implementation + Tailwind Admin + Offline Mobile + Cloud Run (DONE)
+- Thu 4/9: GCP Load Balancer + NEG + Mobile Refinement + Prisma
 - Fri 4/10: Polish + interview at 2pm
 
 ## What Success Looks Like
