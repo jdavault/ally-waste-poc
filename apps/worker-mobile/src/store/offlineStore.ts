@@ -17,15 +17,18 @@ export interface PendingAction {
 
 interface OfflineState {
   outbox: PendingAction[];
+  hydrated: boolean;
   addAction: (action: Omit<PendingAction, 'id'>) => void;
   removeAction: (id: string) => void;
   clearOutbox: () => void;
+  setHydrated: () => void;
 }
 
 export const useOfflineStore = create<OfflineState>()(
   persist(
     (set) => ({
       outbox: [],
+      hydrated: false,
       addAction: (action) => set((state) => ({
         outbox: [...state.outbox, {
           ...action,
@@ -36,10 +39,14 @@ export const useOfflineStore = create<OfflineState>()(
         outbox: state.outbox.filter(a => a.id !== id)
       })),
       clearOutbox: () => set({ outbox: [] }),
+      setHydrated: () => set({ hydrated: true }),
     }),
     {
       name: 'ally-waste-offline',
       storage: createJSONStorage(() => AsyncStorage),
+      onRehydrateStorage: (state) => {
+        return () => state.setHydrated();
+      },
     }
   )
 );

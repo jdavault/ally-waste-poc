@@ -4,7 +4,9 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { StatusBar } from 'expo-status-bar';
 import { useAuthStore } from './src/store/authStore';
+import { useOfflineStore } from './src/store/offlineStore';
 import { SyncService } from './src/offline/syncService';
+import { View, ActivityIndicator } from 'react-native';
 
 // Placeholder screens
 import LoginScreen from './src/screens/LoginScreen';
@@ -16,12 +18,21 @@ const Stack = createNativeStackNavigator();
 const queryClient = new QueryClient();
 
 export default function App() {
-  const { workerId } = useAuthStore();
+  const { workerId, hydrated: authHydrated } = useAuthStore();
+  const { hydrated: offlineHydrated } = useOfflineStore();
 
   useEffect(() => {
     // Initialize offline sync service
     SyncService.init();
   }, []);
+
+  if (!authHydrated || !offlineHydrated) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#101A30' }}>
+        <ActivityIndicator size="large" color="#7EB141" />
+      </View>
+    );
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
