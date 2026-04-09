@@ -16,6 +16,7 @@
 - **Modular monolith** — 9 NestJS modules with clean boundaries, easily splittable later
 - **In-memory repositories** behind a generic `IRepository<T>` interface — swap to Postgres cleanly
 - **Offline-first mobile** — Zustand + AsyncStorage persistence, pending action outbox, sync on reconnect
+- **Production-first clients** — web and mobile default to live API URLs outside development mode
 - **npm workspaces** monorepo — simple, no extra tooling
 
 ## Stack
@@ -27,7 +28,8 @@
 - Docker for backend containerization
 - GitHub Actions CI/CD (lint → build → deploy)
 - **GCP Cloud Run** (Live Production Backend)
-- Cloudflare as CDN/edge layer
+- **GCP HTTPS Load Balancer** in front of Cloud Run
+- Prisma schema for the Postgres migration path
 
 ## Brand
 
@@ -37,7 +39,7 @@
 - Soft Gray `#F1F3F5` — section backgrounds
 - Text Dark `#32373C` — body text
 
-## Project Status (4/8 Close-out)
+## Project Status (2026-04-09)
 
 ### Completed ✅
 - **Modular API**: 9 modules implemented with in-memory persistence and seed data.
@@ -45,19 +47,22 @@
 - **Worker Mobile**: React Navigation flow (Login → Home → Route → Stop).
 - **Offline Sync**: Mobile outbox pattern with automatic and manual sync triggers.
 - **DevOps**: Dockerized backend live on **GCP Cloud Run** via GitHub Actions.
-- **API Unification**: All local development unified on port 8080.
+- **Ingress Hardening**: Cloud Run default URL disabled; API intended to be reached through the load balancer path.
+- **Prisma**: Schema checked into repo for Postgres migration planning.
+- **Geospatial**: Worker stop detail shows proximity in miles; admin timeline can display proximity info from event payloads.
 
 ### In Progress / Upcoming ⏳
-- **GCP Networking**: Global Load Balancer, Serverless NEG, and Static IP setup.
-- **Native Assets**: Finalize iOS/Android icon and splash screen generation.
-- **Data Persistence**: Prisma schema and Postgres migration (optional for POC).
+- **Admin Static Deploy**: GitHub Actions now includes admin-web publish, but GCS bucket IAM for the service account still needs to be fixed.
+- **SPA Fallback**: Direct loads of frontend routes like `/workers` still need proper `index.html` fallback through the current LB/static setup.
+- **Realtime**: Small WebSocket event stream for admin route activity.
+- **Offline Refinement**: Durable outbox states, retry handling, idempotency, and better worker feedback.
 
-## Timeline
+## Current Priorities
 
-- Tue 4/7: Scaffold monorepo + shared types + module shells (DONE)
-- Wed 4/8: API implementation + Tailwind Admin + Offline Mobile + Cloud Run (DONE)
-- Thu 4/9: GCP Load Balancer + NEG + Mobile Refinement + Prisma
-- Fri 4/10: Polish + interview at 2pm
+1. Fix admin-web production deploy permissions and rerun the workflow
+2. Fix SPA deep-link routing for frontend routes
+3. Add the small WebSocket event stream
+4. Refine offline mobile behavior
 
 ## What Success Looks Like
 
@@ -65,3 +70,4 @@
 - Strong architecture story for interview discussion
 - Offline-first mobile with visible sync behavior
 - Dockerized backend deployable to Cloud Run
+- Frontend and API both deploy cleanly through the live production path
