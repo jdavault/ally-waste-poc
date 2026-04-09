@@ -6,6 +6,7 @@ import {
   RouteStopStatus,
   EventType,
   EntityType,
+  getProximityResult,
 } from '@ally-waste/shared-types';
 import { RoutesRepository } from './routes.repository';
 import { RouteStopsRepository } from './route-stops.repository';
@@ -132,6 +133,8 @@ export class RoutesService {
       throw new NotFoundException(`Stop ${stopId} not found`);
     }
 
+    const proximity = this.getStopProximity(stop.buildingId, dto.lat, dto.lng);
+
     const updated = this.routeStopsRepository.update(stopId, {
       status: RouteStopStatus.COMPLETED,
       completedAt: dto.timestamp,
@@ -144,7 +147,13 @@ export class RoutesService {
       EntityType.ROUTE_STOP,
       stopId,
       EventType.STOP_COMPLETED,
-      { lat: dto.lat, lng: dto.lng },
+      {
+        lat: dto.lat,
+        lng: dto.lng,
+        distanceMeters: proximity?.distanceMeters,
+        proximityBand: proximity?.band,
+        proximityLabel: proximity?.label,
+      },
     );
 
     this.checkRouteCompletion(stop.routeId);
@@ -180,6 +189,8 @@ export class RoutesService {
       throw new NotFoundException(`Stop ${stopId} not found`);
     }
 
+    const proximity = this.getStopProximity(stop.buildingId, dto.lat, dto.lng);
+
     const updated = this.routeStopsRepository.update(stopId, {
       status: RouteStopStatus.ISSUE,
       issueCode: dto.issueCode,
@@ -194,7 +205,15 @@ export class RoutesService {
       EntityType.ROUTE_STOP,
       stopId,
       EventType.STOP_ISSUE,
-      { issueCode: dto.issueCode, notes: dto.notes },
+      {
+        issueCode: dto.issueCode,
+        notes: dto.notes,
+        lat: dto.lat,
+        lng: dto.lng,
+        distanceMeters: proximity?.distanceMeters,
+        proximityBand: proximity?.band,
+        proximityLabel: proximity?.label,
+      },
     );
 
     this.checkRouteCompletion(stop.routeId);
@@ -224,5 +243,21 @@ export class RoutesService {
         },
       );
     }
+  }
+
+  private getStopProximity(buildingId: string, lat?: number, lng?: number) {
+    if (lat == null || lng == null) {
+      return null;
+    }
+
+    const building = this.buildingsRepository.findById(buildingId);
+    if (!building) {
+      return null;
+    }
+
+    return getProximityResult(
+      { lat, lng },
+      { lat: building.lat, lng: building.lng },
+    );
   }
 }

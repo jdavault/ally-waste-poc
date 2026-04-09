@@ -7,6 +7,32 @@ import { ChevronRight, Clock, MapPin, User, Building2, CheckCircle2, AlertCircle
 export default function RouteDetailPage() {
   const { id } = useParams();
 
+  const renderEventDetails = (payload: Record<string, unknown>) => {
+    const parts: string[] = [];
+
+    if (typeof payload.proximityLabel === 'string' && typeof payload.distanceMeters === 'number') {
+      parts.push(`${payload.proximityLabel} (${payload.distanceMeters}m)`);
+    }
+
+    if (typeof payload.issueCode === 'string') {
+      parts.push(`Issue: ${payload.issueCode}`);
+    }
+
+    if (typeof payload.notes === 'string' && payload.notes.length > 0) {
+      parts.push(payload.notes);
+    }
+
+    if (typeof payload.reason === 'string' && payload.reason.length > 0) {
+      parts.push(payload.reason);
+    }
+
+    if (parts.length > 0) {
+      return parts.join(' • ');
+    }
+
+    return JSON.stringify(payload).substring(0, 100);
+  };
+
   const { data: route, isLoading: loadingRoute } = useQuery<Route>({
     queryKey: ['routes', id],
     queryFn: () => apiFetch<Route>(`/routes/${id}`),
@@ -176,7 +202,7 @@ export default function RouteDetailPage() {
                   </span>
                 </div>
                 <h5 className="text-sm font-black text-ally-navy uppercase tracking-tight">{event.eventType.replace(/_/g, ' ')}</h5>
-                <p className="text-xs font-medium text-slate-500 mt-1">{JSON.stringify(event.payload).substring(0, 100)}</p>
+                <p className="text-xs font-medium text-slate-500 mt-1">{renderEventDetails(event.payload)}</p>
               </div>
             ))}
             {(!events || events.length === 0) && (

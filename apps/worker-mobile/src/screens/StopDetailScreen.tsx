@@ -1,15 +1,18 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, ActivityIndicator, Alert, TextInput, ScrollView } from 'react-native';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import * as Location from 'expo-location';
 import { apiFetch } from '../api/client';
 import { useOfflineStore } from '../store/offlineStore';
-import { RouteStop, RouteStopStatus } from '@ally-waste/shared-types';
-import { CheckCircle2, XCircle, AlertTriangle, Camera, MapPin, ChevronLeft } from 'lucide-react-native';
+import {
+  Building,
+  RouteStop,
+  getProximityResult,
+} from '@ally-waste/shared-types';
+import { CheckCircle2, XCircle, AlertTriangle, Camera, MapPin } from 'lucide-react-native';
 
 export default function StopDetailScreen({ route, navigation }: any) {
   const { stopId } = route.params;
-  const queryClient = useQueryClient();
   const { addAction } = useOfflineStore();
   const [isProcessing, setIsProcessing] = useState(false);
   const [notes, setNotes] = useState('');
@@ -18,6 +21,56 @@ export default function StopDetailScreen({ route, navigation }: any) {
     queryKey: ['stops', stopId],
     queryFn: () => apiFetch<RouteStop>(`/route-stops/${stopId}`),
   });
+
+  const { data: building } = useQuery<Building>({
+    queryKey: ['buildings', stop?.buildingId],
+    queryFn: () => apiFetch<Building>(`/buildings/${stop?.buildingId}`),
+    enabled: !!stop?.buildingId,
+  });
+
+  const [currentPosition, setCurrentPosition] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadCurrentPosition() {
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+          return;
+        }
+
+        const location = await Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.Balanced,
+        });
+
+        if (!active) {
+          return;
+        }
+
+        setCurrentPosition({
+          lat: location.coords.latitude,
+          lng: location.coords.longitude,
+        });
+      } catch (error) {
+        console.warn('Unable to load current position for proximity', error);
+      }
+    }
+
+    loadCurrentPosition();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const proximity = getProximityResult(
+    currentPosition,
+    building ? { lat: building.lat, lng: building.lng } : null,
+  );
 
   const handleAction = async (type: 'COMPLETE_STOP' | 'MISS_STOP' | 'REPORT_ISSUE') => {
     setIsProcessing(true);
@@ -65,6 +118,15 @@ export default function StopDetailScreen({ route, navigation }: any) {
           <View style={styles.locationRow}>
             <MapPin size={14} color="#94A3B8" />
             <Text style={styles.locationText}>Building Bld-{stop?.buildingId.substring(0, 4)}</Text>
+          </View>
+          <View style={styles.proximityCard}>
+            <Text style={styles.proximityLabel}>Current proximity</Text>
+            <Text style={styles.proximityValue}>
+              {proximity ? `${proximity.label} • ${proximity.distanceMeters}m` : 'Checking position...'}
+            </Text>
+            <Text style={styles.proximityHint}>
+              Uses current device GPS compared to the target building location.
+            </Text>
           </View>
         </View>
 
@@ -175,6 +237,34 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#64748B',
+  },
+  proximityCard: {
+    marginTop: 18,
+    backgroundColor: '#F8FAFC',
+    borderRadius: 18,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  proximityLabel: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#94A3B8',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  },
+  proximityValue: {
+    marginTop: 6,
+    fontSize: 20,
+    fontWeight: '900',
+    color: '#101A30',
+  },
+  proximityHint: {
+    marginTop: 4,
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#64748B',
+    lineHeight: 18,
   },
   actionSection: {
     marginBottom: 25,
