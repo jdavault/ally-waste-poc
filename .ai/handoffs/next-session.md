@@ -43,12 +43,33 @@ User → 34.8.229.233
 
 ## First Thing To Do Next Session
 
-1. **Test the domain URLs**:
-   ```bash
-   curl -v https://ally-admin.p3solutionsgroup.com/
-   curl https://ally-admin.p3solutionsgroup.com/api/health
+**LB IS LIVE** — TLS finished warming up after session end. User confirmed `https://ally-admin.p3solutionsgroup.com/` is reachable.
+
+**BLOCKER: React version mismatch in admin-web bundle** (error #527 in browser console):
+```
+Uncaught Error: Minified React error #527; args[]=19.1.0&args[]=19.2.4
+```
+
+Admin-web has `react-dom` 19.2.4 but `react` 19.1.0 got hoisted from worker-mobile (which pins 19.1.0). Vite bundled both, crashing at runtime.
+
+**Fix:**
+1. Pin both to the same version in `apps/admin-web/package.json` — simplest is to match mobile at `19.1.0`:
+   ```json
+   "react": "19.1.0",
+   "react-dom": "19.1.0"
    ```
-2. If those work, the LB is fully live. If not, check `gcloud compute ssl-certificates describe ally-waste-managed-cert --global` and wait longer.
+2. Clean install:
+   ```bash
+   rm -rf node_modules apps/admin-web/node_modules apps/worker-mobile/node_modules
+   npm install
+   ```
+3. Rebuild and redeploy:
+   ```bash
+   npm run build -w @ally-waste/admin-web
+   gcloud storage cp -r apps/admin-web/dist/* gs://ally-waste-admin-assets-personal-mcp-485500/
+   ```
+4. Verify in browser (hard refresh) — `https://ally-admin.p3solutionsgroup.com/`
+5. Then check API: `curl https://ally-admin.p3solutionsgroup.com/api/health`
 
 ## Gotchas Found This Session
 
