@@ -1,13 +1,24 @@
-import { RouteStatus } from '@ally-waste/shared-types'
-import 'bootstrap/dist/css/bootstrap.min.css'
+import { Routes, Route } from 'react-router-dom';
+import './index.css';
+import Layout from './components/Layout';
+import DashboardPage from './pages/DashboardPage';
+import PropertiesPage from './pages/PropertiesPage';
+import PropertyDetailPage from './pages/PropertyDetailPage';
+import RoutesPage from './pages/RoutesPage';
+import RouteDetailPage from './pages/RouteDetailPage';
+import WorkersPage from './pages/WorkersPage';
 
-function App() {
+export default function App() {
   return (
-    <div className="container mt-4">
-      <h1>Ally Waste Admin</h1>
-      <p className="text-muted">Route statuses: {Object.values(RouteStatus).join(', ')}</p>
-    </div>
-  )
+    <Routes>
+      <Route element={<Layout />}>
+        <Route path="/" element={<DashboardPage />} />
+        <Route path="/properties" element={<PropertiesPage />} />
+        <Route path="/properties/:id" element={<PropertyDetailPage />} />
+        <Route path="/routes" element={<RoutesPage />} />
+        <Route path="/routes/:id" element={<RouteDetailPage />} />
+        <Route path="/workers" element={<WorkersPage />} />
+      </Route>
+    </Routes>
+  );
 }
-
-export default App

@@ -1,4 +1,34 @@
 import { Injectable } from '@nestjs/common';
+import { EventLog, EntityType, EventType } from '@ally-waste/shared-types';
+import { EventsRepository } from './events.repository';
+import { v4 as uuid } from 'uuid';
 
 @Injectable()
-export class EventsService {}
+export class EventsService {
+  constructor(private readonly eventsRepository: EventsRepository) {}
+
+  findByRouteId(routeId: string): EventLog[] {
+    return this.eventsRepository.findByRouteId(routeId);
+  }
+
+  findByEntity(entityType: EntityType, entityId: string): EventLog[] {
+    return this.eventsRepository.findByEntity(entityType, entityId);
+  }
+
+  logEvent(
+    entityType: EntityType,
+    entityId: string,
+    eventType: EventType,
+    payload: Record<string, unknown>,
+  ): EventLog {
+    const event: EventLog = {
+      id: uuid(),
+      entityType,
+      entityId,
+      eventType,
+      payload,
+      createdAt: new Date().toISOString(),
+    };
+    return this.eventsRepository.create(event);
+  }
+}

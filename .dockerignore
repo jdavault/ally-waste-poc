@@ -1,0 +1,13 @@
+node_modules
+dist
+.git
+.gitignore
+README.md
+*.md
+.claude
+.gemini
+.ai
+apps/admin-web/node_modules
+apps/worker-mobile/node_modules
+apps/api/node_modules
+packages/shared-types/node_modules
