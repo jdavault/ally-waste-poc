@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useFocusEffect } from '@react-navigation/native';
 import { apiFetch } from '../api/client';
 import { Route, RouteStop, RouteStopStatus } from '@ally-waste/shared-types';
-import { ChevronRight, Home, CheckCircle2, AlertCircle, XCircle, MapPin, RefreshCcw } from 'lucide-react-native';
+import { ChevronRight, Home, CheckCircle2, AlertCircle, XCircle, MapPin, RefreshCcw, ChevronLeft } from 'lucide-react-native';
 
 export default function RouteDetailScreen({ route, navigation }: any) {
   const { routeId } = route.params;
@@ -37,6 +37,16 @@ export default function RouteDetailScreen({ route, navigation }: any) {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
+        <View style={styles.navActions}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.navBtn}>
+            <ChevronLeft size={16} color="#101A30" />
+            <Text style={styles.navBtnText}>Back</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('Home')} style={styles.navBtn}>
+            <Home size={16} color="#101A30" />
+            <Text style={styles.navBtnText}>Home</Text>
+          </TouchableOpacity>
+        </View>
         <View style={styles.headerRow}>
           <Text style={styles.title}>Stop Hierarchy</Text>
           <View style={styles.rightHeader}>
@@ -104,6 +114,29 @@ const styles = StyleSheet.create({
     padding: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#E2E8F0',
+  },
+  navActions: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 16,
+  },
+  navBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#F8FAFC',
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  navBtnText: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#101A30',
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
   },
   headerRow: {
     flexDirection: 'row',

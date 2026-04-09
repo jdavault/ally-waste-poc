@@ -10,8 +10,8 @@ export default function RouteDetailPage() {
   const renderEventDetails = (payload: Record<string, unknown>) => {
     const parts: string[] = [];
 
-    if (typeof payload.proximityLabel === 'string' && typeof payload.distanceMeters === 'number') {
-      parts.push(`${payload.proximityLabel} (${payload.distanceMeters}m)`);
+    if (typeof payload.proximityLabel === 'string' && typeof payload.distanceMiles === 'number') {
+      parts.push(`${payload.proximityLabel} (${payload.distanceMiles} mi)`);
     }
 
     if (typeof payload.issueCode === 'string') {

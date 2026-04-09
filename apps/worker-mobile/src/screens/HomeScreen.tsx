@@ -5,7 +5,7 @@ import { apiFetch } from '../api/client';
 import { useAuthStore } from '../store/authStore';
 import { useOfflineStore } from '../store/offlineStore';
 import { Route, RouteStatus } from '@ally-waste/shared-types';
-import { MapPin, Route as RouteIcon, Clock, RefreshCcw, LogOut, ChevronRight } from 'lucide-react-native';
+import { MapPin, Route as RouteIcon, Clock, RefreshCcw, LogOut, ChevronRight, ArrowLeftRight } from 'lucide-react-native';
 import { SyncService } from '../offline/syncService';
 
 export default function HomeScreen({ navigation }: any) {
@@ -139,6 +139,16 @@ export default function HomeScreen({ navigation }: any) {
             <Clock color="#CBD5E1" size={48} />
             <Text style={styles.emptyTitle}>No Route Assigned</Text>
             <Text style={styles.emptySubtitle}>Check back later or contact dispatch if you believe this is an error.</Text>
+            <View style={styles.emptyActions}>
+              <TouchableOpacity style={styles.secondaryBtn} onPress={() => refetch()} activeOpacity={0.8}>
+                <RefreshCcw color="#101A30" size={16} />
+                <Text style={styles.secondaryBtnText}>Refresh Assignment</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.secondaryBtn} onPress={handleLogout} activeOpacity={0.8}>
+                <ArrowLeftRight color="#101A30" size={16} />
+                <Text style={styles.secondaryBtnText}>Change Operator</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         )}
 
@@ -380,6 +390,30 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 8,
     lineHeight: 18,
+  },
+  emptyActions: {
+    width: '100%',
+    gap: 12,
+    marginTop: 22,
+  },
+  secondaryBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: '#F8FAFC',
+    borderRadius: 16,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  secondaryBtnText: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#101A30',
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
   },
   statsGrid: {
     flexDirection: 'row',

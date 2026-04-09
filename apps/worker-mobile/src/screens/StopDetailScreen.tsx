@@ -9,7 +9,7 @@ import {
   RouteStop,
   getProximityResult,
 } from '@ally-waste/shared-types';
-import { CheckCircle2, XCircle, AlertTriangle, Camera, MapPin } from 'lucide-react-native';
+import { CheckCircle2, XCircle, AlertTriangle, Camera, MapPin, ChevronLeft, House } from 'lucide-react-native';
 
 export default function StopDetailScreen({ route, navigation }: any) {
   const { stopId } = route.params;
@@ -112,6 +112,16 @@ export default function StopDetailScreen({ route, navigation }: any) {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scroll}>
+        <View style={styles.navActions}>
+          <TouchableOpacity style={styles.navBtn} onPress={() => navigation.goBack()} activeOpacity={0.8}>
+            <ChevronLeft color="#101A30" size={16} />
+            <Text style={styles.navBtnText}>Back</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.navBtn} onPress={() => navigation.navigate('Home')} activeOpacity={0.8}>
+            <House color="#101A30" size={16} />
+            <Text style={styles.navBtnText}>Home</Text>
+          </TouchableOpacity>
+        </View>
         <View style={styles.card}>
           <Text style={styles.unitLabel}>Unit Details</Text>
           <Text style={styles.unitNumber}>Unit {stop?.unitId.substring(0, 4).toUpperCase() || '####'}</Text>
@@ -122,7 +132,9 @@ export default function StopDetailScreen({ route, navigation }: any) {
           <View style={styles.proximityCard}>
             <Text style={styles.proximityLabel}>Current proximity</Text>
             <Text style={styles.proximityValue}>
-              {proximity ? `${proximity.label} • ${proximity.distanceMeters}m` : 'Checking position...'}
+              {proximity
+                ? `${proximity.label} • ${proximity.distanceMiles} mi`
+                : 'Checking position...'}
             </Text>
             <Text style={styles.proximityHint}>
               Uses current device GPS compared to the target building location.
@@ -202,6 +214,29 @@ const styles = StyleSheet.create({
   },
   scroll: {
     padding: 20,
+  },
+  navActions: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 16,
+  },
+  navBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#F8FAFC',
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  navBtnText: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#101A30',
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
   },
   card: {
     backgroundColor: '#fff',

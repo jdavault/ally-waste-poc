@@ -7,6 +7,7 @@ export interface Coordinates {
 
 export interface ProximityResult {
   distanceMeters: number;
+  distanceMiles: number;
   band: ProximityBand;
   label: string;
 }
@@ -52,6 +53,10 @@ export function getProximityBand(distanceMeters: number): ProximityBand {
   return 'FAR_AWAY';
 }
 
+export function metersToMiles(distanceMeters: number): number {
+  return Number((distanceMeters / 1609.344).toFixed(1));
+}
+
 export function formatProximityLabel(band: ProximityBand): string {
   switch (band) {
     case 'ON_SITE':
@@ -78,6 +83,7 @@ export function getProximityResult(
 
   return {
     distanceMeters,
+    distanceMiles: metersToMiles(distanceMeters),
     band,
     label: formatProximityLabel(band),
   };

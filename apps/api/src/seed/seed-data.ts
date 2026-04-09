@@ -33,22 +33,22 @@ const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
 export const properties: Property[] = [
   {
     id: 'prop-001',
-    name: 'Oakwood Apartments',
-    address: '4200 Cedar Springs Rd, Dallas, TX 75219',
-    timezone: 'America/Chicago',
-    lat: 32.8087,
-    lng: -96.8021,
+    name: 'Oakwood Courtyards',
+    address: '210 E McKinley St, Phoenix, AZ 85004',
+    timezone: 'America/Phoenix',
+    lat: 33.4563,
+    lng: -112.0701,
     active: true,
     createdAt: '2026-01-15T00:00:00.000Z',
     updatedAt: '2026-01-15T00:00:00.000Z',
   },
   {
     id: 'prop-002',
-    name: 'Riverside Commons',
-    address: '1800 Main St, Dallas, TX 75201',
-    timezone: 'America/Chicago',
-    lat: 32.7825,
-    lng: -96.7985,
+    name: 'Stevens Creek Residences',
+    address: '550 E Roosevelt St, Phoenix, AZ 85004',
+    timezone: 'America/Phoenix',
+    lat: 33.4584,
+    lng: -112.0669,
     active: true,
     createdAt: '2026-02-01T00:00:00.000Z',
     updatedAt: '2026-02-01T00:00:00.000Z',
@@ -60,14 +60,14 @@ export const properties: Property[] = [
 // ---------------------------------------------------------------------------
 
 export const buildings: Building[] = [
-  // Oakwood Apartments
+  // Oakwood Courtyards
   {
     id: 'bldg-001',
     propertyId: 'prop-001',
     name: 'Building A',
     accessNotes: 'Main entrance code: 4521. Dumpster area behind north wing.',
-    lat: 32.8089,
-    lng: -96.8023,
+    lat: 33.4565,
+    lng: -112.0698,
     createdAt: '2026-01-15T00:00:00.000Z',
     updatedAt: '2026-01-15T00:00:00.000Z',
   },
@@ -76,19 +76,19 @@ export const buildings: Building[] = [
     propertyId: 'prop-001',
     name: 'Building B',
     accessNotes: 'Gate code: 7890. Use side entrance for trash area.',
-    lat: 32.8091,
-    lng: -96.8019,
+    lat: 33.456,
+    lng: -112.0705,
     createdAt: '2026-01-15T00:00:00.000Z',
     updatedAt: '2026-01-15T00:00:00.000Z',
   },
-  // Riverside Commons
+  // Stevens Creek Residences
   {
     id: 'bldg-003',
     propertyId: 'prop-002',
     name: 'Tower 1',
     accessNotes: 'Lobby access via key fob. Service elevator on east side.',
-    lat: 32.7827,
-    lng: -96.7987,
+    lat: 33.4587,
+    lng: -112.0666,
     createdAt: '2026-02-01T00:00:00.000Z',
     updatedAt: '2026-02-01T00:00:00.000Z',
   },
@@ -98,8 +98,8 @@ export const buildings: Building[] = [
     name: 'Tower 2',
     accessNotes:
       'Enter through parking garage level 1. Trash chute room on each floor.',
-    lat: 32.7823,
-    lng: -96.7983,
+    lat: 33.4581,
+    lng: -112.0672,
     createdAt: '2026-02-01T00:00:00.000Z',
     updatedAt: '2026-02-01T00:00:00.000Z',
   },
