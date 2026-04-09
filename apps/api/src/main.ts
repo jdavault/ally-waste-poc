@@ -21,7 +21,7 @@ async function bootstrap() {
       title: 'Ally Waste API',
       description: 'Valet trash and recycling logistics platform API',
       version: '1.0',
-      path: 'spec',
+      path: 'api/spec',
     });
 
     const port = Number(process.env.PORT) || 8080;
