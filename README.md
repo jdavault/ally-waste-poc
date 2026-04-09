@@ -45,5 +45,12 @@ docker compose up --build
 ## ☁️ Deployment
 The backend is automatically deployed to **GCP Cloud Run** via GitHub Actions on every push to `main`.
 
+## 🛡️ Production Readiness (Roadmap)
+While this POC uses a Global External Load Balancer for the demo, a production deployment would include:
+- **Cloudflare Edge**: WAF, Rate Limiting, and DDoS protection in front of the GCP Load Balancer.
+- **Enhanced Caching**: Edge-caching for static React assets via Cloudflare CDN while bypassing cache for `/api/*` to maintain transactional integrity.
+- **Persistence**: Migration from In-Memory to **PostgreSQL (Cloud SQL)** via Prisma.
+- **Identity**: Integration with **Auth0** or **Firebase Auth** for secure multi-tenant access.
+
 ---
 *Developed as a high-performance POC for Ally Waste.*
