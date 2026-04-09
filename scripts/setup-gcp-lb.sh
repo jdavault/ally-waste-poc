@@ -17,8 +17,7 @@
 PROJECT_ID="personal-mcp-485500"
 REGION="us-central1"
 RUN_SERVICE="ally-waste-api"
-DOMAIN="p3solutionsgroup.com"
-ALT_DOMAIN="www.p3solutionsgroup.com"
+DOMAIN="ally-admin.p3solutionsgroup.com"
 
 # Resource names
 FRONTEND_BUCKET="ally-waste-admin-assets-${PROJECT_ID}"
@@ -57,11 +56,10 @@ gcloud compute addresses create "${IP_NAME}" --global
 # Display the IP for DNS configuration
 RESERVED_IP=$(gcloud compute addresses describe "${IP_NAME}" --global --format="get(address)")
 echo "✅ IP Reserved: ${RESERVED_IP}"
-echo "⚠️ ACTION REQUIRED: Update Namecheap A records for @ and www to point to ${RESERVED_IP}"
-
+echo "⚠️ ACTION REQUIRED: Update Namecheap A record for 'ally-admin' to point to ${RESERVED_IP}"
 echo "🔐 Creating Managed SSL Certificate..."
 gcloud compute ssl-certificates create "${CERT_NAME}" \
-  --domains="${DOMAIN},${ALT_DOMAIN}" \
+  --domains="${DOMAIN}" \
   --global
 
 echo "🔗 Creating Serverless NEG for Cloud Run..."
@@ -98,6 +96,7 @@ gcloud compute url-maps add-path-matcher "${URL_MAP}" \
   --path-matcher-name="api-matcher" \
   --default-backend-bucket="${BACKEND_BUCKET_NAME}" \
   --path-rules="/api/*=${BACKEND_SERVICE}"
+
 
 # 5. TARGET PROXY & FORWARDING RULE
 echo "📡 Creating HTTPS Proxy and Forwarding Rule..."
