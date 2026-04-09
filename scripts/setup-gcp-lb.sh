@@ -49,7 +49,14 @@ gcloud storage buckets add-iam-policy-binding "gs://${FRONTEND_BUCKET}" \
   --member="allUsers" \
   --role="roles/storage.objectViewer"
 
-# 2. NETWORKING & SECURITY
+# 2. BUILD AND UPLOAD FRONTEND
+echo "🔨 Building admin-web..."
+npm run build -w @ally-waste/admin-web
+
+echo "📤 Uploading assets to gs://${FRONTEND_BUCKET}..."
+gcloud storage cp -r apps/admin-web/dist/* "gs://${FRONTEND_BUCKET}"
+
+# 3. NETWORKING & SECURITY
 echo "🌐 Reserving Global Static IP..."
 gcloud compute addresses create "${IP_NAME}" --global
 
