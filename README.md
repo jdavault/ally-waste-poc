@@ -1,63 +1,49 @@
-# Ally Waste Interview POC
+# Ally Waste POC
 
-A full-stack logistics and compliance platform built as a proof of concept for **Ally Waste Services**.
+A modern logistics and waste management platform proof-of-concept.
 
-## Project Goals
+## 🚀 Overview
+This project demonstrates a high-signal full-stack architecture for field operations. It features a modular NestJS API, a reactive Admin Dashboard, and a professional delivery pipeline.
 
-This POC demonstrates senior-level architecture and implementation for:
-- **Admin Dashboard (Web)**: Property management and logistics monitoring.
-- **Worker App (Mobile)**: Nightly service reporting with offline support.
-- **Modular Monolith API**: Scalable NestJS backend with clear domain boundaries.
-- **Shared Type System**: Consistent domain models across all layers.
+## 🏗️ Architecture
+- **Modular Monolith API**: NestJS with clean domain boundaries.
+- **Modern Admin Web**: React + Tailwind CSS + TanStack Query.
+- **Shared Package**: Centralized TypeScript types for end-to-end safety.
+- **Containerized**: Fully Dockerized backend for consistent local and cloud runtimes.
 
-## Tech Stack
+## 🛠️ Tech Stack
+- **Backend**: NestJS, class-validator, Swagger, In-Memory Repositories.
+- **Frontend**: Vite, React, Tailwind CSS, Lucide Icons, Zustand.
+- **DevOps**: Docker, GitHub Actions, GCP Cloud Run.
 
-- **Monorepo**: npm workspaces
-- **Backend**: NestJS (Modular Monolith)
-- **Admin Web**: React + Vite + Bootstrap
-- **Worker Mobile**: Expo (React Native)
-- **State Management**: TanStack Query + Zustand
-- **Types**: Shared TypeScript packages
-- **Infra (Planned)**: Docker, GCP Cloud Run, GitHub Actions
-
-## Directory Structure
-
-- `apps/api`: NestJS backend API.
-- `apps/admin-web`: React-based property manager dashboard.
-- `apps/worker-mobile`: Expo-based valet field app.
-- `packages/shared-types`: Shared domain models, enums, and DTO types.
-- `asset/images`: Official brand assets and reference screenshots.
-- `.ai/`: AI-assisted development context (memory, agents, tasks).
-
-## Getting Started
+## 🏁 Getting Started
 
 ### Prerequisites
-- Node.js (v20+)
-- npm (v10+)
+- Node.js 22+
+- Docker & Docker Compose
 
-### Installation
+### Local Development
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+2. Start the API (Local):
+   ```bash
+   npm run dev:api
+   ```
+3. Start the Admin Web:
+   ```bash
+   npm run dev:admin
+   ```
+
+### Docker Local Run
+Build and start the containerized API on port 8080:
 ```bash
-npm install
+docker compose up --build
 ```
 
-### Development
-```bash
-# Start the API
-npm run dev:api
-
-# Start the Admin Dashboard
-npm run dev:admin
-
-# Start the Worker Mobile App
-npm run dev:mobile
-```
-
-## Brand Guidelines
-
-- **Primary Navy**: `#101A30` (Trust, Logistics)
-- **Primary Green**: `#7EB141` (Sustainability, Growth)
-- **Secondary Green**: `#00D084` (Action, Success)
-- **Soft Gray**: `#F1F3F5` (UI Backgrounds)
+## ☁️ Deployment
+The backend is automatically deployed to **GCP Cloud Run** via GitHub Actions on every push to `main`.
 
 ---
-*Built by Gemini CLI for Ally Waste.*
+*Developed as a high-performance POC for Ally Waste.*
