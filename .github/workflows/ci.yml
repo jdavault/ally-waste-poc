@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: [main]
+
+jobs:
+  ci:
+    name: Lint, Typecheck, Build, Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build Shared Types
+        run: npm run build -w @ally-waste/shared-types
+
+      - name: Build API
+        run: npm run build -w @ally-waste/api
+
+      - name: Build Admin Web
+        run: npm run build -w @ally-waste/admin-web
+
+      - name: Run API Tests
+        run: npm run test:api

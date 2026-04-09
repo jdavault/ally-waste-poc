@@ -1,25 +1,30 @@
-name: CI/CD Pipeline
+name: Deploy API
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Branch, tag, or SHA to deploy'
+        required: false
+        default: 'main'
 
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   REGION: us-central1
   SERVICE_NAME: ally-waste-api
   IMAGE_NAME: us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/ally-waste-api/api
-  FRONTEND_BUCKET: ally-waste-admin-assets-${{ secrets.GCP_PROJECT_ID }}
   CLOUD_RUN_INGRESS: internal-and-cloud-load-balancing
 
 jobs:
-  ci:
-    name: Continuous Integration
+  deploy-api:
+    name: Build and Deploy API to Cloud Run
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.sha }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -29,12 +34,6 @@ jobs:
 
       - name: Install dependencies
         run: npm install
-
-      - name: Lint
-        run: npm run lint
-
-      - name: Typecheck
-        run: npm run typecheck
 
       - name: Build Shared Types
         run: npm run build -w @ally-waste/shared-types
@@ -42,47 +41,13 @@ jobs:
       - name: Build API
         run: npm run build -w @ally-waste/api
 
-      - name: Build Admin Web
-        run: npm run build -w @ally-waste/admin-web
-
-      - name: Run API Tests
-        run: npm run test:api
-
-  cd:
-    name: Continuous Deployment
-    needs: ci
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build Shared Types
-        run: npm run build -w @ally-waste/shared-types
-
-      - name: Build Admin Web
-        run: npm run build -w @ally-waste/admin-web
-
       - name: Google Auth
-        id: auth
         uses: 'google-github-actions/auth@v2'
         with:
           credentials_json: '${{ secrets.GCP_SA_KEY }}'
 
       - name: Set up Cloud SDK
         uses: 'google-github-actions/setup-gcloud@v2'
-
-      - name: Upload Admin Web Assets
-        run: |-
-          gcloud storage rsync apps/admin-web/dist gs://$FRONTEND_BUCKET --recursive --delete-unmatched-destination-objects
 
       - name: Authorize Docker
         run: gcloud auth configure-docker us-central1-docker.pkg.dev

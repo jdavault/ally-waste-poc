@@ -1,0 +1,53 @@
+name: Deploy Admin Web
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Branch, tag, or SHA to deploy'
+        required: false
+        default: 'main'
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  FRONTEND_BUCKET: ally-waste-admin-assets-${{ secrets.GCP_PROJECT_ID }}
+
+jobs:
+  deploy-admin:
+    name: Build and Deploy Admin Web to GCS
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.sha }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Shared Types
+        run: npm run build -w @ally-waste/shared-types
+
+      - name: Build Admin Web
+        run: npm run build -w @ally-waste/admin-web
+
+      - name: Google Auth
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
+      - name: Set up Cloud SDK
+        uses: 'google-github-actions/setup-gcloud@v2'
+
+      - name: Upload to GCS
+        run: |-
+          gcloud storage rsync apps/admin-web/dist gs://$FRONTEND_BUCKET \
+            --recursive \
+            --delete-unmatched-destination-objects
