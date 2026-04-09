@@ -9,7 +9,7 @@ import { User, ChevronRight } from 'lucide-react-native';
 export default function LoginScreen() {
   const { setWorker } = useAuthStore();
   
-  const { data: workers, isLoading, error } = useQuery<Worker[]>({
+  const { data: workers, isLoading } = useQuery<Worker[]>({
     queryKey: ['workers'],
     queryFn: () => apiFetch<Worker[]>('/workers'),
   });
@@ -32,7 +32,7 @@ export default function LoginScreen() {
       <View style={styles.header}>
         <Text style={styles.brandAlly}>Ally <Text style={styles.brandWaste}>Waste</Text></Text>
         <Text style={styles.subtitle}>Select your operator profile to begin</Text>
-      </header>
+      </View>
 
       <FlatList
         data={workers}
