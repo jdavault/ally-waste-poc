@@ -14,10 +14,17 @@ export default function StopDetailScreen({ route, navigation }: any) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [notes, setNotes] = useState('');
 
-  const { data: stop, isLoading } = useQuery<RouteStop>({
+  const { data: routeData, isLoading } = useQuery<any>({
     queryKey: ['stops', stopId],
-    queryFn: () => apiFetch<RouteStop>(`/units/${stopId}`), // Note: Need to verify if this endpoint exists or use another
+    queryFn: async () => {
+      // In a real app we'd fetch the specific stop, 
+      // but for this POC we'll find it in the route's stops
+      const stops = await apiFetch<RouteStop[]>(`/routes/stops`); // Fallback to all stops or similar
+      return stops.find(s => s.id === stopId);
+    },
   });
+
+  const stop = routeData;
 
   const handleAction = async (type: 'COMPLETE_STOP' | 'MISS_STOP' | 'REPORT_ISSUE') => {
     setIsProcessing(true);

@@ -20,8 +20,26 @@ export default function HomeScreen({ navigation }: any) {
   const route = routeData?.route;
   const stops = routeData?.stops || [];
 
+  const completedStops = stops.filter((s: any) => s.status !== 'PENDING').length;
+  const totalStops = stops.length;
+  const progress = totalStops > 0 ? (completedStops / totalStops) * 100 : 0;
+
   const handleLogout = () => {
     clearWorker();
+  };
+
+  const handleStartRoute = async () => {
+    if (!route) return;
+    try {
+      await apiFetch(`/routes/${route.id}/start`, { method: 'POST' });
+      refetch();
+    } catch (error) {
+      console.error('Failed to start route', error);
+    }
+  };
+
+  const handleSyncNow = () => {
+    SyncService.syncOutbox();
   };
 
   return (
@@ -39,17 +57,21 @@ export default function HomeScreen({ navigation }: any) {
         </View>
 
         {/* Sync Status Card */}
-        <View style={[styles.syncCard, outbox.length > 0 ? styles.syncPending : styles.syncClean]}>
+        <TouchableOpacity 
+          onPress={handleSyncNow}
+          style={[styles.syncCard, outbox.length > 0 ? styles.syncPending : styles.syncClean]}
+          activeOpacity={0.7}
+        >
           <View style={styles.syncInfo}>
             <RefreshCcw color={outbox.length > 0 ? '#B45309' : '#059669'} size={20} />
             <Text style={[styles.syncText, outbox.length > 0 ? styles.syncTextPending : styles.syncTextClean]}>
               {outbox.length > 0 ? `${outbox.length} actions waiting to sync` : 'All data synchronized'}
             </Text>
           </View>
-          <TouchableOpacity onPress={() => refetch()} style={styles.refreshBtn}>
+          <View style={styles.refreshBtn}>
             <RefreshCcw color="#64748B" size={16} />
-          </TouchableOpacity>
-        </View>
+          </View>
+        </TouchableOpacity>
 
         {/* Today's Route Section */}
         <View style={styles.sectionHeader}>
@@ -59,44 +81,54 @@ export default function HomeScreen({ navigation }: any) {
         {isLoading ? (
           <ActivityIndicator size="small" color="#7EB141" style={{ marginTop: 20 }} />
         ) : route ? (
-          <TouchableOpacity 
-            style={styles.routeCard}
-            onPress={() => navigation.navigate('RouteDetail', { routeId: route.id })}
-            activeOpacity={0.9}
-          >
-            <View style={styles.routeHeader}>
-              <View style={[styles.statusBadge, route.status === RouteStatus.COMPLETED ? styles.bgSuccess : styles.bgInfo]}>
-                <Text style={styles.statusText}>{route.status}</Text>
+          <View style={styles.routeContainer}>
+            <TouchableOpacity 
+              style={styles.routeCard}
+              onPress={() => navigation.navigate('RouteDetail', { routeId: route.id })}
+              activeOpacity={0.9}
+            >
+              <View style={styles.routeHeader}>
+                <View style={[styles.statusBadge, route.status === RouteStatus.COMPLETED ? styles.bgSuccess : styles.bgInfo]}>
+                  <Text style={styles.statusText}>{route.status}</Text>
+                </View>
+                <Text style={styles.routeDate}>{new Date(route.serviceDate).toLocaleDateString()}</Text>
               </View>
-              <Text style={styles.routeDate}>{new Date(route.serviceDate).toLocaleDateString()}</Text>
-            </View>
 
-            <View style={styles.routeMain}>
-              <View style={styles.routeIconBox}>
-                <RouteIcon color="#7EB141" size={32} />
+              <View style={styles.routeMain}>
+                <View style={styles.routeIconBox}>
+                  <RouteIcon color="#7EB141" size={32} />
+                </View>
+                <View style={styles.routeInfo}>
+                  <Text style={styles.propertyLabel}>Service Location</Text>
+                  <Text style={styles.propertyName}>Property Asset {route.propertyId.substring(0, 8).toUpperCase()}</Text>
+                  <View style={styles.stopCount}>
+                    <MapPin color="#94A3B8" size={14} />
+                    <Text style={styles.stopText}>{stops.length} Stops Scheduled</Text>
+                  </View>
+                </View>
+                <ChevronRight color="#CBD5E1" size={24} />
               </View>
-              <View style={styles.routeInfo}>
-                <Text style={styles.propertyLabel}>Service Location</Text>
-                <Text style={styles.propertyName}>Property Asset {route.propertyId.substring(0, 8).toUpperCase()}</Text>
-                <View style={styles.stopCount}>
-                  <MapPin color="#94A3B8" size={14} />
-                  <Text style={styles.stopText}>{stops.length} Stops Scheduled</Text>
+
+              <View style={styles.routeFooter}>
+                <View style={styles.progressContainer}>
+                  <View style={styles.progressBar}>
+                    <View style={[styles.progressFill, { width: `${progress}%` }]} />
+                  </View>
+                  <Text style={styles.progressText}>{Math.round(progress)}%</Text>
                 </View>
               </View>
-              <ChevronRight color="#CBD5E1" size={24} />
-            </View>
+            </TouchableOpacity>
 
-            <View style={styles.routeFooter}>
-              <View style={styles.progressContainer}>
-                <View style={styles.progressBar}>
-                  <View style={[styles.progressFill, { width: route.status === RouteStatus.COMPLETED ? '100%' : '0%' }]} />
-                </View>
-                <Text style={styles.progressText}>
-                  {route.status === RouteStatus.COMPLETED ? 'Completed' : 'Pending Start'}
-                </Text>
-              </View>
-            </View>
-          </TouchableOpacity>
+            {route.status === RouteStatus.PENDING && (
+              <TouchableOpacity 
+                style={styles.startBtn} 
+                onPress={handleStartRoute}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.startBtnText}>Start Service Route</Text>
+              </TouchableOpacity>
+            )}
+          </View>
         ) : (
           <View style={styles.emptyState}>
             <Clock color="#CBD5E1" size={48} />
@@ -298,6 +330,28 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: '#64748B',
     textTransform: 'uppercase',
+  },
+  routeContainer: {
+    gap: 15,
+  },
+  startBtn: {
+    backgroundColor: '#7EB141',
+    paddingVertical: 18,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#7EB141',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 5,
+  },
+  startBtnText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
   },
   emptyState: {
     backgroundColor: '#FFFFFF',

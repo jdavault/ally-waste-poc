@@ -1,14 +1,15 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, SafeAreaView, ActivityIndicator } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
+import { useFocusEffect } from '@react-navigation/native';
 import { apiFetch } from '../api/client';
 import { Route, RouteStop, RouteStopStatus } from '@ally-waste/shared-types';
-import { ChevronRight, Home, CheckCircle2, AlertCircle, XCircle, MapPin } from 'lucide-react-native';
+import { ChevronRight, Home, CheckCircle2, AlertCircle, XCircle, MapPin, RefreshCcw } from 'lucide-react-native';
 
 export default function RouteDetailScreen({ route, navigation }: any) {
   const { routeId } = route.params;
 
-  const { data: routeData, isLoading } = useQuery<{ route: Route, stops: RouteStop[] }>({
+  const { data: routeData, isLoading, refetch } = useQuery<{ route: Route, stops: RouteStop[] }>({
     queryKey: ['routes', routeId, 'stops'],
     queryFn: async () => {
       const route = await apiFetch<Route>(`/routes/${routeId}`);
@@ -16,6 +17,12 @@ export default function RouteDetailScreen({ route, navigation }: any) {
       return { route, stops };
     },
   });
+
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [refetch])
+  );
 
   const stops = routeData?.stops || [];
 
@@ -32,7 +39,12 @@ export default function RouteDetailScreen({ route, navigation }: any) {
       <View style={styles.header}>
         <View style={styles.headerRow}>
           <Text style={styles.title}>Stop Hierarchy</Text>
-          <Text style={styles.count}>{stops.length} Total</Text>
+          <View style={styles.rightHeader}>
+            <TouchableOpacity onPress={() => refetch()} style={styles.refreshBtn}>
+              <RefreshCcw size={16} color="#64748B" />
+            </TouchableOpacity>
+            <Text style={styles.count}>{stops.length} Total</Text>
+          </View>
         </View>
         <View style={styles.progressInfo}>
           <Text style={styles.subtitle}>Sequence optimized for logistics</Text>
@@ -97,6 +109,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  rightHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  refreshBtn: {
+    padding: 8,
+    backgroundColor: '#F1F3F5',
+    borderRadius: 8,
   },
   title: {
     fontSize: 20,
