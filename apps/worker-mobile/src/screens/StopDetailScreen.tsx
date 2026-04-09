@@ -6,6 +6,7 @@ import { apiFetch } from '../api/client';
 import { useOfflineStore } from '../store/offlineStore';
 import {
   Building,
+  Property,
   RouteStop,
   getProximityResult,
 } from '@ally-waste/shared-types';
@@ -26,6 +27,12 @@ export default function StopDetailScreen({ route, navigation }: any) {
     queryKey: ['buildings', stop?.buildingId],
     queryFn: () => apiFetch<Building>(`/buildings/${stop?.buildingId}`),
     enabled: !!stop?.buildingId,
+  });
+
+  const { data: property } = useQuery<Property>({
+    queryKey: ['properties', building?.propertyId],
+    queryFn: () => apiFetch<Property>(`/properties/${building?.propertyId}`),
+    enabled: !!building?.propertyId,
   });
 
   const [currentPosition, setCurrentPosition] = useState<{
@@ -125,10 +132,16 @@ export default function StopDetailScreen({ route, navigation }: any) {
         <View style={styles.card}>
           <Text style={styles.unitLabel}>Unit Details</Text>
           <Text style={styles.unitNumber}>Unit {stop?.unitId.substring(0, 4).toUpperCase() || '####'}</Text>
+          <Text style={styles.propertyName}>{property?.name || 'Loading service location...'}</Text>
           <View style={styles.locationRow}>
             <MapPin size={14} color="#94A3B8" />
-            <Text style={styles.locationText}>Building Bld-{stop?.buildingId.substring(0, 4)}</Text>
+            <Text style={styles.locationText}>
+              {building ? `${building.name} • ${property?.address ?? 'Loading address...'}` : 'Loading building details...'}
+            </Text>
           </View>
+          {building?.accessNotes ? (
+            <Text style={styles.accessNotes}>{building.accessNotes}</Text>
+          ) : null}
           <View style={styles.proximityCard}>
             <Text style={styles.proximityLabel}>Current proximity</Text>
             <Text style={styles.proximityValue}>
@@ -262,16 +275,31 @@ const styles = StyleSheet.create({
     color: '#101A30',
     marginVertical: 5,
   },
+  propertyName: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#101A30',
+    marginTop: 2,
+  },
   locationRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    marginTop: 5,
+    marginTop: 8,
   },
   locationText: {
     fontSize: 14,
     fontWeight: '600',
     color: '#64748B',
+    flex: 1,
+    lineHeight: 20,
+  },
+  accessNotes: {
+    marginTop: 10,
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#64748B',
+    lineHeight: 18,
   },
   proximityCard: {
     marginTop: 18,

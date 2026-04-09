@@ -33,7 +33,7 @@ const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
 export const properties: Property[] = [
   {
     id: 'prop-001',
-    name: 'Oakwood Courtyards',
+    name: 'Camelback Courtyards',
     address: '210 E McKinley St, Phoenix, AZ 85004',
     timezone: 'America/Phoenix',
     lat: 33.4563,
@@ -44,11 +44,11 @@ export const properties: Property[] = [
   },
   {
     id: 'prop-002',
-    name: 'Stevens Creek Residences',
-    address: '550 E Roosevelt St, Phoenix, AZ 85004',
+    name: 'Heritage Ranch Residences',
+    address: '2757 S Market St, Gilbert, AZ 85295',
     timezone: 'America/Phoenix',
-    lat: 33.4584,
-    lng: -112.0669,
+    lat: 33.3049,
+    lng: -111.7421,
     active: true,
     createdAt: '2026-02-01T00:00:00.000Z',
     updatedAt: '2026-02-01T00:00:00.000Z',
@@ -60,12 +60,12 @@ export const properties: Property[] = [
 // ---------------------------------------------------------------------------
 
 export const buildings: Building[] = [
-  // Oakwood Courtyards
+  // Camelback Courtyards
   {
     id: 'bldg-001',
     propertyId: 'prop-001',
-    name: 'Building A',
-    accessNotes: 'Main entrance code: 4521. Dumpster area behind north wing.',
+    name: 'Desert Palm',
+    accessNotes: 'Main entrance code: 4521. Service corral behind the north wing.',
     lat: 33.4565,
     lng: -112.0698,
     createdAt: '2026-01-15T00:00:00.000Z',
@@ -74,32 +74,32 @@ export const buildings: Building[] = [
   {
     id: 'bldg-002',
     propertyId: 'prop-001',
-    name: 'Building B',
-    accessNotes: 'Gate code: 7890. Use side entrance for trash area.',
+    name: 'Copper Sky',
+    accessNotes: 'Gate code: 7890. Use the alley-side service entrance.',
     lat: 33.456,
-    lng: -112.0705,
+    lng: -112.0708,
     createdAt: '2026-01-15T00:00:00.000Z',
     updatedAt: '2026-01-15T00:00:00.000Z',
   },
-  // Stevens Creek Residences
+  // Heritage Ranch Residences
   {
     id: 'bldg-003',
     propertyId: 'prop-002',
-    name: 'Tower 1',
-    accessNotes: 'Lobby access via key fob. Service elevator on east side.',
-    lat: 33.4587,
-    lng: -112.0666,
+    name: 'Ranch House East',
+    accessNotes: 'Leasing office key fob required. Service lane on the east side.',
+    lat: 33.3052,
+    lng: -111.7418,
     createdAt: '2026-02-01T00:00:00.000Z',
     updatedAt: '2026-02-01T00:00:00.000Z',
   },
   {
     id: 'bldg-004',
     propertyId: 'prop-002',
-    name: 'Tower 2',
+    name: 'Ranch House West',
     accessNotes:
-      'Enter through parking garage level 1. Trash chute room on each floor.',
-    lat: 33.4581,
-    lng: -112.0672,
+      'Enter through resident parking. Compactor area near the west fence.',
+    lat: 33.3046,
+    lng: -111.7425,
     createdAt: '2026-02-01T00:00:00.000Z',
     updatedAt: '2026-02-01T00:00:00.000Z',
   },

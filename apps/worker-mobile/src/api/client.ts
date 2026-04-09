@@ -7,7 +7,10 @@ const DEFAULT_URL = Platform.select({
   default: 'http://localhost:3000/api',
 });
 
-const BASE_URL = process.env.EXPO_PUBLIC_API_URL || DEFAULT_URL;
+const PROD_URL = 'https://ally-admin.p3solutionsgroup.com/api';
+const BASE_URL =
+  process.env.EXPO_PUBLIC_API_URL ||
+  (__DEV__ ? DEFAULT_URL : PROD_URL);
 
 export async function apiFetch<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const url = `${BASE_URL}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
