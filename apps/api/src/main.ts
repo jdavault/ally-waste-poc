@@ -22,10 +22,11 @@ async function bootstrap() {
     path: 'spec',
   });
 
-  const port = process.env.PORT ?? 3000;
-  await app.listen(port);
+  const port = process.env.PORT ?? 8080;
+  await app.listen(port, '0.0.0.0');
 
-  console.log(`API running on: http://localhost:${port}/api`);
+  console.log(`API running on: http://0.0.0.0:${port}/api`);
+
   console.log(`Health check:   http://localhost:${port}/api/health`);
   console.log(`Swagger docs:   http://localhost:${port}/spec`);
 }
