@@ -54,8 +54,8 @@ This preserves a simple public `/api/*` path for the admin app without leaving t
 
 ## 🛡️ Production Readiness (Roadmap)
 While this POC uses a Global External Load Balancer for the demo, a production deployment would include:
-- **Cloudflare Edge**: WAF, Rate Limiting, and DDoS protection in front of the GCP Load Balancer.
-- **Enhanced Caching**: Edge-caching for static React assets via Cloudflare CDN while bypassing cache for `/api/*` to maintain transactional integrity.
+- **GCP-Native Hardening**: Additional WAF / DDoS mitigation where appropriate for the project environment.
+- **Caching Strategy**: Better static asset caching while keeping `/api/*` transactional and conservative.
 - **Persistence**: Migration from In-Memory to **PostgreSQL (Cloud SQL)** via Prisma.
 - **Identity**: Integration with **Auth0** or **Firebase Auth** for secure multi-tenant access.
 

@@ -18,8 +18,9 @@ What the repo already demonstrates well:
 What should be framed as next-step hardening rather than complete:
 
 - private Cloud Run ingress behind a load balancer
-- Cloudflare edge proxy, WAF, CDN, and SSL strategy
+- GCP-native edge protection, caching, and traffic control
 - Cloud SQL provisioning and production Postgres wiring
+- real-time event delivery to operations staff
 - stronger offline sync guarantees and partial-failure handling
 - geospatial routing / distance-aware operational logic
 
@@ -30,8 +31,9 @@ The right senior framing is:
 - built an end-to-end operations POC across admin, mobile, and API
 - chose a modular monolith deliberately for delivery speed and clean boundaries
 - implemented an offline-capable worker workflow with queued sync
+- added operational visibility through real-time and geospatial features where they matter
 - shipped a Docker artifact and a lightweight CI/CD path to Cloud Run
-- identified the next infra steps: private ingress, Cloudflare edge controls, persistence, observability, and geospatial optimization
+- identified the next infra steps: private ingress, GCP-native protection, persistence, observability, and geospatial optimization
 
 ## Goal
 
@@ -109,7 +111,7 @@ The main purpose is to demonstrate:
 - GitHub Actions for CI/CD
 - GCP Cloud Run for API deployment
 - GCP HTTPS Load Balancer in front of Cloud Run
-- Cloudflare as an optional edge layer for DNS, WAF, DDoS mitigation, and caching if time allows
+- GCP-native security and traffic controls where helpful
 
 ---
 
@@ -474,7 +476,7 @@ A clean, small pipeline is enough.
 - backend API on **Cloud Run**
 - admin web deployed separately as static assets
 - GCP HTTPS Load Balancer fronts the API
-- Cloudflare is a follow-on edge enhancement, not a prerequisite for the POC
+- GCP-native protection can be layered on without changing the app architecture
 - Cloud SQL documented as next step, not required for POC
 
 ### Network / Security target state
@@ -488,20 +490,14 @@ The target posture should be:
 
 Do not claim this is complete unless the deployed service has actually been changed to match.
 
-### Cloudflare target scope
+### Optional GCP Hardening Scope
 
-If Cloudflare is added in this POC, keep it narrow:
+If you add more edge protection in this POC, keep it narrow:
 
-- proxy the public admin hostname
-- enable WAF and managed DDoS protections
-- cache static admin assets aggressively
-- leave dynamic API routes mostly un-cached
-
-Nice-to-have, not required for the core interview story:
-
-- DNS management in Cloudflare
-- full SSL termination strategy redesign
-- complex page-rule or worker-based routing
+- validate the load balancer and ingress posture end to end
+- add GCP-native WAF / DDoS mitigation only if it is low-risk
+- keep caching strategy conservative for dynamic API routes
+- document where static asset caching happens today and where it could be improved later
 
 ### Why Cloud Run
 
@@ -536,6 +532,21 @@ The win condition is:
 8. API deployed to Cloud Run behind the desired ingress posture
 9. clean README and architecture story
 10. one educational geospatial capability
+
+---
+
+## Final Worth-Doing List
+
+The highest-signal remaining work is:
+
+1. geospatial / logistics capability
+2. small WebSocket real-time event stream
+3. offline mobile refinement
+4. admin and mobile operational fidelity
+5. Prisma / Postgres path with strong judgment
+6. light GCP-native hardening only if low risk
+
+The first three are the core implementation priorities.
 
 ---
 
@@ -649,35 +660,16 @@ Screens:
 
 ---
 
-# Day 2 - Offline-First Mobile + Docker + Backend Cleanup
+# Day 2 - Geospatial + WebSockets + Offline Refinement
 
 ## Target outcome
 
-- worker app persists data locally
-- pending actions outbox works
-- GPS capture on stop events works
-- backend architecture cleaned up
-- backend Dockerized and runs locally in container
+- GPS and distance context are part of the workflow
+- admin receives real-time route event updates
+- offline behavior is more durable and visible to the worker
+- backend architecture stays simple and demo-safe
 
-## Step 1 - Implement offline-first outbox
-
-Persist:
-
-- worker session
-- route snapshot
-- stops
-- pending actions
-- last sync
-
-## Step 2 - Add GPS capture
-
-Capture location on:
-
-- route start
-- stop completion
-- optional manual ping
-
-## Step 2b - Add one geospatial capability
+## Step 1 - Add one geospatial capability
 
 Keep this intentionally small and explainable.
 
@@ -693,26 +685,45 @@ Best POC-sized outcome:
 - surface "on-site / nearby / far away" in the worker flow or event timeline
 - log the computed distance with the event payload for discussion during the interview
 
-## Step 3 - Add event timeline support
+## Step 2 - Add a small WebSocket event stream
 
-Every route action should create an event entry.
+Keep the scope narrow and demoable.
 
-## Step 4 - Dockerize the backend
+Recommended outcome:
+
+- broadcast route and stop events to the admin app
+- update the route detail timeline in real time
+- use existing event concepts instead of inventing a separate real-time model
+
+Good events to stream:
+
+- route started
+- route completed
+- stop completed
+- stop missed
+- issue reported
+- sync batch processed
+
+## Step 3 - Refine the offline outbox
+
+The current queue proves the concept. The next step is to make it feel field-ready.
 
 Add:
 
-- `apps/api/Dockerfile`
-- `.dockerignore`
+- durable client action IDs
+- explicit action states: pending, syncing, synced, failed
+- last successful sync timestamp
+- manual retry for failed items
+- clearer connectivity and queue status in the worker UI
 
-Optional:
+If feasible, also add:
 
-- `docker-compose.yml` for future backend + postgres local mode
+- idempotent handling on the backend for replayed mobile actions
+- conflict visibility instead of silent failure
 
-### Definition of done
+## Step 4 - Preserve event timeline support
 
-- backend builds in Docker
-- backend runs locally in Docker
-- app can hit the containerized backend
+Every route action should create an event entry, and admin should be able to consume that timeline clearly.
 
 ## Step 5 - Write initial README sections
 
@@ -721,9 +732,9 @@ Document:
 - project purpose
 - architecture
 - local setup
-- Docker commands
+- deployment and ingress posture
 - module boundaries
-- cloud deployment plan
+- offline behavior and sync model
 
 ---
 
@@ -785,14 +796,14 @@ Target:
 - verify `/api` still works end to end
 - document the exact deployment command and settings used
 
-## Step 5 - Optional Cloudflare edge pass
+## Step 5 - Optional GCP edge hardening pass
 
 Only do this if the ingress work is already done.
 
 Candidate scope:
 
-- proxy the admin host through Cloudflare
-- enable WAF managed rules
+- verify the load balancer path is the only public API path
+- evaluate GCP-native WAF / DDoS protection if the current project setup supports it cleanly
 - confirm static asset caching behavior
 - leave API caching conservative
 
@@ -813,7 +824,7 @@ Document:
 - event timeline
 - sync status visibility
 - architecture diagram
-- talking points for Docker / Cloud Run / modular monolith / ingress / Cloudflare
+- talking points for Docker / Cloud Run / modular monolith / ingress / GCP-native hardening
 
 ---
 
@@ -840,13 +851,25 @@ Priority 2:
 
 Priority 3:
 
-- add only a narrow Cloudflare slice if time remains
-- start with proxy + WAF + caching for admin static assets
-- leave API caching conservative
-- do not spend time on advanced DNS or SSL redesign unless it is already mostly configured
+- add a small WebSocket real-time event stream for route activity
+- update admin route detail in real time using the existing event model
+- keep it small and avoid live GPS streaming at this stage
 
 Priority 4:
 
+- refine offline mobile behavior into a clearer outbox model
+- add explicit sync states, retry handling, and worker-visible sync status
+- favor durability and clarity over sync complexity
+
+Priority 5:
+
+- only add GCP-native WAF / DDoS protection if the current setup supports it with low risk
+- keep caching conservative for API traffic
+- do not spend time on broad edge/network redesign unless it directly strengthens the current demo
+
+Priority 6:
+
+- improve admin and mobile operational fidelity after the geospatial, real-time, and offline work lands
 - keep interview wording precise until ingress is actually private
 - say “Cloud Run + load balancer path” instead of “locked down behind internal ingress” until verified
 - say “offline-capable queued sync POC” instead of “production-grade offline replay”
@@ -982,21 +1005,19 @@ If you have enough time:
 
 ---
 
-## Cloudflare Talking Points
+## GCP Hardening Talking Points
 
-Use Cloudflare for:
+Use GCP-native controls for:
 
-- CDN
-- edge caching
-- SSL
-- WAF
-- rate limiting
-- static asset delivery
+- load balancer-backed public routing
+- ingress restriction on Cloud Run
+- optional security hardening where it is low-risk
+- selective caching awareness for static versus transactional traffic
 
-Do not put first-pass route transaction logic there.
+Do not overcomplicate the public path for a time-boxed POC.
 
 Best framing:
-“I’d keep transaction-heavy operational workflows on the core API and use Cloudflare for delivery, security, and selective caching.”
+“I kept the public surface area tight by routing the app through the load balancer path, removing the default Cloud Run URL, and leaving room for additional GCP-native protection as the next operational step.”
 
 ---
 
