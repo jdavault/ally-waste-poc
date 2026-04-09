@@ -27,11 +27,12 @@ export default function RoutesPage() {
     queryFn: () => apiFetch<Worker[]>('/workers'),
   });
 
-  const getPropertyName = (id: string) => properties?.find(p => p.id === id)?.name || 'Unknown Property';
-  const getWorkerName = (id: string | null) => id ? workers?.find(w => w.id === id)?.name || 'Unknown Worker' : 'Unassigned';
-
   const filteredRoutes = useMemo(() => {
     if (!routes) return [];
+    
+    const getPropertyName = (id: string) => properties?.find(p => p.id === id)?.name || 'Unknown Property';
+    const getWorkerName = (id: string | null) => id ? workers?.find(w => w.id === id)?.name || 'Unknown Worker' : 'Unassigned';
+
     return routes.filter((r) => {
       const propName = getPropertyName(r.propertyId).toLowerCase();
       const workerName = getWorkerName(r.workerId).toLowerCase();
@@ -53,8 +54,8 @@ export default function RoutesPage() {
     setPage(1);
   };
 
-  const handleFilter = (val: any) => {
-    setStatusFilter(val);
+  const handleFilter = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setStatusFilter(e.target.value as any);
     setPage(1);
   };
 
@@ -93,7 +94,7 @@ export default function RoutesPage() {
           <select 
             className="flex-1 md:w-48 px-4 py-2.5 bg-slate-50 border-none rounded-xl text-sm font-bold text-ally-navy focus:ring-2 focus:ring-ally-green/50 transition-all outline-none cursor-pointer"
             value={statusFilter}
-            onChange={(e) => handleFilter(e.target.value)}
+            onChange={handleFilter}
           >
             <option value="all">All Statuses</option>
             {Object.values(RouteStatus).map(status => (
@@ -133,7 +134,9 @@ export default function RoutesPage() {
                         <div className="p-1.5 bg-slate-100 rounded-lg text-slate-400 group-hover:text-ally-green transition-colors">
                           <Building2 size={14} />
                         </div>
-                        <span className="font-bold text-ally-navy">{getPropertyName(route.propertyId)}</span>
+                        <span className="font-bold text-ally-navy">
+                          {properties?.find(p => p.id === route.propertyId)?.name || 'Unknown Property'}
+                        </span>
                       </div>
                     </td>
                     <td className="px-6 py-4">
@@ -142,7 +145,7 @@ export default function RoutesPage() {
                           <User size={14} />
                         </div>
                         <span className={`text-sm font-bold ${route.workerId ? 'text-slate-700' : 'text-slate-300 italic'}`}>
-                          {getWorkerName(route.workerId)}
+                          {route.workerId ? workers?.find(w => w.id === route.workerId)?.name || 'Unknown Worker' : 'Unassigned'}
                         </span>
                       </div>
                     </td>

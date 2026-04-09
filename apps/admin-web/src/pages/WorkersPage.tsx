@@ -37,8 +37,8 @@ export default function WorkersPage() {
     setPage(1);
   };
 
-  const handleFilter = (val: typeof statusFilter) => {
-    setStatusFilter(val);
+  const handleFilter = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setStatusFilter(e.target.value as 'all' | 'active' | 'inactive');
     setPage(1);
   };
 
@@ -78,7 +78,7 @@ export default function WorkersPage() {
           <select 
             className="flex-1 md:w-48 px-4 py-2.5 bg-slate-50 border-none rounded-xl text-sm font-bold text-ally-navy focus:ring-2 focus:ring-ally-green/50 transition-all outline-none cursor-pointer"
             value={statusFilter}
-            onChange={(e) => handleFilter(e.target.value as any)}
+            onChange={handleFilter}
           >
             <option value="all">All Statuses</option>
             <option value="active">Active Only</option>
