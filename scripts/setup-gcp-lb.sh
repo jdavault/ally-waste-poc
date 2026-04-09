@@ -9,6 +9,7 @@
 # 3. Google-Managed SSL Certificate
 # 4. Serverless NEG for Cloud Run Backend
 # 5. Global HTTP(S) Load Balancer with URL Map routing
+# 6. HTTP -> HTTPS redirect (port 80 -> 443)
 # ---------------------------------------------------------------------------
 
 # -----------------------------
@@ -27,8 +28,11 @@ BACKEND_BUCKET_NAME="ally-waste-admin-backend-bucket"
 URL_MAP="ally-waste-url-map"
 CERT_NAME="ally-waste-managed-cert"
 HTTPS_PROXY="ally-waste-https-proxy"
+HTTP_PROXY="ally-waste-http-proxy"
+HTTP_REDIRECT_URL_MAP="ally-waste-http-redirect"
 IP_NAME="ally-waste-global-ip"
 HTTPS_FWD_RULE="ally-waste-https-rule"
+HTTP_FWD_RULE="ally-waste-http-rule"
 
 echo "🚀 Starting GCP Infrastructure Setup for ${DOMAIN}..."
 
@@ -117,6 +121,31 @@ gcloud compute forwarding-rules create "${HTTPS_FWD_RULE}" \
   --address="${IP_NAME}" \
   --target-https-proxy="${HTTPS_PROXY}" \
   --ports=443
+
+# 6. HTTP -> HTTPS REDIRECT
+echo "🔁 Creating HTTP -> HTTPS redirect..."
+
+# Redirect URL map (no backends, just a 301 to HTTPS)
+gcloud compute url-maps import "${HTTP_REDIRECT_URL_MAP}" --global --source=/dev/stdin <<EOF
+kind: compute#urlMap
+name: ${HTTP_REDIRECT_URL_MAP}
+defaultUrlRedirect:
+  redirectResponseCode: MOVED_PERMANENTLY_DEFAULT
+  httpsRedirect: true
+  stripQuery: false
+EOF
+
+# HTTP target proxy pointing at the redirect URL map
+gcloud compute target-http-proxies create "${HTTP_PROXY}" \
+  --url-map="${HTTP_REDIRECT_URL_MAP}"
+
+# HTTP forwarding rule on port 80 using the same static IP
+gcloud compute forwarding-rules create "${HTTP_FWD_RULE}" \
+  --global \
+  --load-balancing-scheme=EXTERNAL_MANAGED \
+  --address="${IP_NAME}" \
+  --target-http-proxy="${HTTP_PROXY}" \
+  --ports=80
 
 echo "✨ Setup complete!"
 echo "-----------------------------------------------------------------------"
