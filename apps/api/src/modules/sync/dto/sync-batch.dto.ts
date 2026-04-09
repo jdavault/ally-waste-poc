@@ -12,7 +12,9 @@ import { Type } from 'class-transformer';
 import { IssueCode } from '@ally-waste/shared-types';
 
 export class PendingActionDto {
-  @ApiProperty({ enum: ['COMPLETE_STOP', 'MISS_STOP', 'REPORT_ISSUE', 'LOCATION_PING'] })
+  @ApiProperty({
+    enum: ['COMPLETE_STOP', 'MISS_STOP', 'REPORT_ISSUE', 'LOCATION_PING'],
+  })
   @IsString()
   type: 'COMPLETE_STOP' | 'MISS_STOP' | 'REPORT_ISSUE' | 'LOCATION_PING';
 

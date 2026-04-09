@@ -55,7 +55,7 @@ export default function RoutesPage() {
   };
 
   const handleFilter = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setStatusFilter(e.target.value as any);
+    setStatusFilter(e.target.value as 'all' | RouteStatus);
     setPage(1);
   };
 

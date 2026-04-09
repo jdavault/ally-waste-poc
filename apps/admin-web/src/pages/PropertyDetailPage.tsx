@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useParams, Link } from 'react-router-dom';
 import { Property, Building, Unit, PickupSchedule } from '@ally-waste/shared-types';
 import { apiFetch } from '../api/client';
-import { Building2, Home, Clock, ChevronRight, MapPin, Calendar, Info } from 'lucide-react';
+import { Building2, Clock, ChevronRight, MapPin, Calendar, Info } from 'lucide-react';
 
 export default function PropertyDetailPage() {
   const { id } = useParams();

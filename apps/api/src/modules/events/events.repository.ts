@@ -21,12 +21,11 @@ export class EventsRepository extends InMemoryRepository<EventLog> {
     return this.entities.filter(
       (e) =>
         (e.entityType === EntityType.ROUTE && e.entityId === routeId) ||
-        (e.entityType === EntityType.ROUTE_STOP &&
-          this.isStopInRoute(e.entityId, routeId)),
+        (e.entityType === EntityType.ROUTE_STOP && this.isStopInRoute()),
     );
   }
 
-  private isStopInRoute(stopId: string, routeId: string): boolean {
+  private isStopInRoute(): boolean {
     // In a real DB this would be a join.
     // For now, we'd need access to RouteStopsRepository or just search the entityId
     // But since this is a POC, we can keep it simple or inject the other repo.

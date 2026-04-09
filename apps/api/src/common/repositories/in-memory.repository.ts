@@ -1,8 +1,8 @@
 import { IRepository } from '../interfaces/repository.interface';
 
-export abstract class InMemoryRepository<T extends { id: string }>
-  implements IRepository<T>
-{
+export abstract class InMemoryRepository<
+  T extends { id: string },
+> implements IRepository<T> {
   protected entities: T[] = [];
 
   constructor(initialData: T[] = []) {

@@ -29,4 +29,4 @@ async function bootstrap() {
   console.log(`Health check:   http://localhost:${port}/api/health`);
   console.log(`Swagger docs:   http://localhost:${port}/spec`);
 }
-bootstrap();
+void bootstrap();

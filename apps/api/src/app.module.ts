@@ -13,7 +13,18 @@ import { EventsModule } from './modules/events/events.module';
 import { HealthModule } from './modules/health/health.module';
 
 @Module({
-  imports: [HealthModule, PropertiesModule, BuildingsModule, UnitsModule, SchedulesModule, WorkersModule, RoutesModule, TrackingModule, SyncModule, EventsModule],
+  imports: [
+    HealthModule,
+    PropertiesModule,
+    BuildingsModule,
+    UnitsModule,
+    SchedulesModule,
+    WorkersModule,
+    RoutesModule,
+    TrackingModule,
+    SyncModule,
+    EventsModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

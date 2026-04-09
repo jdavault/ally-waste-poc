@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useParams, Link } from 'react-router-dom';
 import { Route, RouteStop, RouteStatus, RouteStopStatus, EventLog, Worker, Property } from '@ally-waste/shared-types';
 import { apiFetch } from '../api/client';
-import { ChevronRight, Clock, MapPin, User, Building2, CheckCircle2, AlertCircle, PlayCircle, History } from 'lucide-react';
+import { ChevronRight, Clock, MapPin, User, Building2, CheckCircle2, AlertCircle, History } from 'lucide-react';
 
 export default function RouteDetailPage() {
   const { id } = useParams();

@@ -91,7 +91,7 @@ export class RoutesService {
   }
 
   assignWorker(routeId: string, dto: AssignWorkerDto): Route {
-    const route = this.findById(routeId);
+    this.findById(routeId);
     const updated = this.routesRepository.update(routeId, {
       workerId: dto.workerId,
       updatedAt: new Date().toISOString(),
@@ -195,9 +195,7 @@ export class RoutesService {
 
   private checkRouteCompletion(routeId: string): void {
     const stops = this.routeStopsRepository.findByRouteId(routeId);
-    const allDone = stops.every(
-      (s) => s.status !== RouteStopStatus.PENDING,
-    );
+    const allDone = stops.every((s) => s.status !== RouteStopStatus.PENDING);
 
     if (allDone) {
       const now = new Date().toISOString();
@@ -211,7 +209,11 @@ export class RoutesService {
         EntityType.ROUTE,
         routeId,
         EventType.ROUTE_COMPLETED,
-        { stopsCompleted: stops.filter((s) => s.status === RouteStopStatus.COMPLETED).length },
+        {
+          stopsCompleted: stops.filter(
+            (s) => s.status === RouteStopStatus.COMPLETED,
+          ).length,
+        },
       );
     }
   }
