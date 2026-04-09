@@ -11,11 +11,11 @@ import { IssueCode } from '@ally-waste/shared-types';
 export class ReportIssueDto {
   @ApiProperty({ example: '2026-04-08T14:30:00.000Z' })
   @IsDateString()
-  timestamp: string;
+  timestamp!: string;
 
   @ApiProperty({ enum: IssueCode, example: IssueCode.NO_ACCESS })
   @IsEnum(IssueCode)
-  issueCode: IssueCode;
+  issueCode!: IssueCode;
 
   @ApiPropertyOptional({ example: 'Gate code did not work' })
   @IsOptional()

@@ -16,7 +16,7 @@ export class PendingActionDto {
     enum: ['COMPLETE_STOP', 'MISS_STOP', 'REPORT_ISSUE', 'LOCATION_PING'],
   })
   @IsString()
-  type: 'COMPLETE_STOP' | 'MISS_STOP' | 'REPORT_ISSUE' | 'LOCATION_PING';
+  type!: 'COMPLETE_STOP' | 'MISS_STOP' | 'REPORT_ISSUE' | 'LOCATION_PING';
 
   @ApiPropertyOptional()
   @IsOptional()
@@ -25,7 +25,7 @@ export class PendingActionDto {
 
   @ApiProperty()
   @IsDateString()
-  timestamp: string;
+  timestamp!: string;
 
   @ApiPropertyOptional()
   @IsOptional()
@@ -71,11 +71,11 @@ export class PendingActionDto {
 export class SyncBatchDto {
   @ApiProperty()
   @IsString()
-  workerId: string;
+  workerId!: string;
 
   @ApiProperty({ type: [PendingActionDto] })
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => PendingActionDto)
-  actions: PendingActionDto[];
+  actions!: PendingActionDto[];
 }

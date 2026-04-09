@@ -9,15 +9,15 @@ export class LocationPingDto {
 
   @ApiProperty({ example: '2026-04-08T14:30:00.000Z' })
   @IsDateString()
-  timestamp: string;
+  timestamp!: string;
 
   @ApiProperty({ example: 32.8089 })
   @IsNumber()
-  lat: number;
+  lat!: number;
 
   @ApiProperty({ example: -96.8023 })
   @IsNumber()
-  lng: number;
+  lng!: number;
 
   @ApiPropertyOptional({ example: 5.2 })
   @IsOptional()
