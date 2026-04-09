@@ -30,6 +30,12 @@ export class RoutesController {
     return this.routesService.findStopsByRouteId(id);
   }
 
+  @Get('route-stops/:id')
+  @ApiOperation({ summary: 'Get a stop by ID' })
+  findOneStop(@Param('id') id: string) {
+    return this.routesService.findStopById(id);
+  }
+
   @Get('workers/:workerId/today-route')
   @ApiOperation({ summary: "Get a worker's route for today" })
   findTodayRoute(@Param('workerId') workerId: string) {

@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "worker-mobile",
-    "slug": "worker-mobile",
+    "name": "Ally Waste",
+    "slug": "ally-waste-worker",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -10,16 +10,16 @@
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#101A30"
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.jdavault01.worker-mobile"
+      "bundleIdentifier": "com.jdavault01.ally-waste-worker"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#101A30"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false

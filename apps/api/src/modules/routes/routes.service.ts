@@ -46,6 +46,14 @@ export class RoutesService {
     return this.routeStopsRepository.findByRouteId(routeId);
   }
 
+  findStopById(id: string): RouteStop {
+    const stop = this.routeStopsRepository.findById(id);
+    if (!stop) {
+      throw new NotFoundException(`Stop ${id} not found`);
+    }
+    return stop;
+  }
+
   findTodayByWorkerId(workerId: string): Route | undefined {
     return this.routesRepository.findTodayByWorkerId(workerId);
   }

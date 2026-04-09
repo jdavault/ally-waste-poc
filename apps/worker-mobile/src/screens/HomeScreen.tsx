@@ -6,16 +6,21 @@ import { useAuthStore } from '../store/authStore';
 import { useOfflineStore } from '../store/offlineStore';
 import { Route, RouteStatus } from '@ally-waste/shared-types';
 import { MapPin, Route as RouteIcon, Clock, RefreshCcw, LogOut, ChevronRight } from 'lucide-react-native';
+import { SyncService } from '../offline/syncService';
 
 export default function HomeScreen({ navigation }: any) {
   const { workerId, workerName, clearWorker } = useAuthStore();
   const { outbox } = useOfflineStore();
+
+  console.log('[HomeScreen] Rendering for worker:', workerId, workerName);
 
   const { data: routeData, isLoading, refetch } = useQuery<{ route: Route, stops: any[] }>({
     queryKey: ['workers', workerId, 'today-route'],
     queryFn: () => apiFetch<{ route: Route, stops: any[] }>(`/workers/${workerId}/today-route`),
     enabled: !!workerId,
   });
+
+  console.log('[HomeScreen] Route data:', routeData?.route?.status, 'Stops:', routeData?.stops?.length);
 
   const route = routeData?.route;
   const stops = routeData?.stops || [];
