@@ -1,35 +1,64 @@
+import React, { useEffect } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-import { RouteStatus } from '@ally-waste/shared-types';
+import { useAuthStore } from './src/store/authStore';
+import { SyncService } from './src/offline/syncService';
+
+// Placeholder screens
+import LoginScreen from './src/screens/LoginScreen';
+import HomeScreen from './src/screens/HomeScreen';
+import RouteDetailScreen from './src/screens/RouteDetailScreen';
+import StopDetailScreen from './src/screens/StopDetailScreen';
+
+const Stack = createNativeStackNavigator();
+const queryClient = new QueryClient();
 
 export default function App() {
+  const { workerId } = useAuthStore();
+
+  useEffect(() => {
+    // Initialize offline sync service
+    SyncService.init();
+  }, []);
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Ally Waste Worker</Text>
-      <Text style={styles.subtitle}>
-        Route statuses: {Object.values(RouteStatus).join(', ')}
-      </Text>
-      <StatusBar style="auto" />
-    </View>
+    <QueryClientProvider client={queryClient}>
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={{ 
+          headerStyle: { backgroundColor: '#101A30' },
+          headerTintColor: '#fff',
+          headerTitleStyle: { fontWeight: 'bold' }
+        }}>
+          {!workerId ? (
+            <Stack.Screen 
+              name="Login" 
+              component={LoginScreen} 
+              options={{ headerShown: false }} 
+            />
+          ) : (
+            <>
+              <Stack.Screen 
+                name="Home" 
+                component={HomeScreen} 
+                options={{ title: 'Ally Waste' }} 
+              />
+              <Stack.Screen 
+                name="RouteDetail" 
+                component={RouteDetailScreen} 
+                options={{ title: 'Today\'s Route' }} 
+              />
+              <Stack.Screen 
+                name="StopDetail" 
+                component={StopDetailScreen} 
+                options={{ title: 'Stop Actions' }} 
+              />
+            </>
+          )}
+        </Stack.Navigator>
+        <StatusBar style="light" />
+      </NavigationContainer>
+    </QueryClientProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 12,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: '#666',
-    textAlign: 'center',
-  },
-});
