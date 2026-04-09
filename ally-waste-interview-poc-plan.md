@@ -1,8 +1,37 @@
 # Ally Waste Interview POC Plan (v2)
 
-A fast-moving, interview-focused proof of concept designed to show strong full-stack judgment, React + React Native capability, NestJS architecture, offline-first mobile thinking, containerization, CI/CD discipline, and a credible cloud path on GCP.
+A fast-moving, interview-focused proof of concept designed to show strong full-stack judgment, React + React Native capability, NestJS architecture, offline-capable mobile thinking, containerization, CI/CD discipline, and a credible cloud path on GCP.
 
 This is not meant to be a production build. It is a believable field-operations platform that you can stand up quickly, explain clearly, and extend if there is extra time.
+
+## Current Reality
+
+What the repo already demonstrates well:
+
+- React admin dashboard deployed and usable
+- Expo / React Native worker flow with queued offline actions
+- NestJS modular monolith with separate domain modules
+- shared TypeScript contracts across apps
+- Dockerized backend
+- GitHub Actions CI/CD path to GCP Cloud Run
+
+What should be framed as next-step hardening rather than complete:
+
+- private Cloud Run ingress behind a load balancer
+- Cloudflare edge proxy, WAF, CDN, and SSL strategy
+- Cloud SQL provisioning and production Postgres wiring
+- stronger offline sync guarantees and partial-failure handling
+- geospatial routing / distance-aware operational logic
+
+## Interview Positioning
+
+The right senior framing is:
+
+- built an end-to-end operations POC across admin, mobile, and API
+- chose a modular monolith deliberately for delivery speed and clean boundaries
+- implemented an offline-capable worker workflow with queued sync
+- shipped a Docker artifact and a lightweight CI/CD path to Cloud Run
+- identified the next infra steps: private ingress, Cloudflare edge controls, persistence, observability, and geospatial optimization
 
 ## Goal
 
@@ -36,13 +65,12 @@ The main purpose is to demonstrate:
 - React
 - Vite
 - TypeScript
-- Bootstrap
+- Tailwind CSS
 - TanStack Query
-- Zustand
-- React Context where appropriate
+- React Router
 - React Hook Form
 - Zod
-- React Router
+- Zustand
 
 ### Mobile Worker App
 
@@ -55,7 +83,7 @@ The main purpose is to demonstrate:
 - AsyncStorage
 - expo-location
 - NetInfo
-- Expo Router or React Navigation
+- React Navigation
 
 ### Backend API
 
@@ -70,7 +98,8 @@ The main purpose is to demonstrate:
 
 ### Database Design
 
-- Prisma schema for PostgreSQL in parallel
+- relational schema documented for PostgreSQL migration
+- Prisma schema checked into the repo
 - do not block implementation on the DB being complete
 - model relationships clearly enough to discuss indexing, scaling, and migration path
 
@@ -79,7 +108,8 @@ The main purpose is to demonstrate:
 - Docker for backend containerization
 - GitHub Actions for CI/CD
 - GCP Cloud Run for API deployment
-- Cloudflare as CDN / edge / caching / security layer in front of admin assets and read-heavy APIs
+- GCP HTTPS Load Balancer in front of Cloud Run
+- Cloudflare as an optional edge layer for DNS, WAF, DDoS mitigation, and caching if time allows
 
 ---
 
@@ -442,9 +472,36 @@ A clean, small pipeline is enough.
 ### POC deployment target
 
 - backend API on **Cloud Run**
-- admin web can stay local for demo, or be deployed later if time remains
-- Cloudflare discussed as the edge layer
+- admin web deployed separately as static assets
+- GCP HTTPS Load Balancer fronts the API
+- Cloudflare is a follow-on edge enhancement, not a prerequisite for the POC
 - Cloud SQL documented as next step, not required for POC
+
+### Network / Security target state
+
+The target posture should be:
+
+- Cloud Run is not publicly invokable
+- ingress is restricted to the load balancer
+- `/api` routes from the load balancer to the backend service
+- the public admin site talks to the API through the controlled edge path
+
+Do not claim this is complete unless the deployed service has actually been changed to match.
+
+### Cloudflare target scope
+
+If Cloudflare is added in this POC, keep it narrow:
+
+- proxy the public admin hostname
+- enable WAF and managed DDoS protections
+- cache static admin assets aggressively
+- leave dynamic API routes mostly un-cached
+
+Nice-to-have, not required for the core interview story:
+
+- DNS management in Cloudflare
+- full SSL termination strategy redesign
+- complex page-rule or worker-based routing
 
 ### Why Cloud Run
 
@@ -472,11 +529,13 @@ The win condition is:
 1. working admin app
 2. working worker app
 3. working modular Nest API
-4. offline-first mobile flow
+4. offline-capable mobile flow
 5. Dockerized backend
 6. basic GitHub Actions pipeline
-7. API deployed to Cloud Run if time remains
-8. clean README and architecture story
+7. Prisma schema defined in-repo
+8. API deployed to Cloud Run behind the desired ingress posture
+9. clean README and architecture story
+10. one educational geospatial capability
 
 ---
 
@@ -513,7 +572,7 @@ ally-waste-poc/
 - Vite
 - React
 - TypeScript
-- Bootstrap
+- Tailwind CSS
 - TanStack Query
 - Zustand
 - React Router
@@ -618,6 +677,22 @@ Capture location on:
 - stop completion
 - optional manual ping
 
+## Step 2b - Add one geospatial capability
+
+Keep this intentionally small and explainable.
+
+Recommended options:
+
+- use `geolib` to calculate distance from worker ping to stop location and show proximity bands
+- use `@turf/distance` for server-side distance checks and simple geofence validation
+- use `@turf/nearest-point-on-line` later if you decide to model route paths
+
+Best POC-sized outcome:
+
+- compute distance-to-stop
+- surface "on-site / nearby / far away" in the worker flow or event timeline
+- log the computed distance with the event payload for discussion during the interview
+
 ## Step 3 - Add event timeline support
 
 Every route action should create an event entry.
@@ -652,17 +727,36 @@ Document:
 
 ---
 
-# Day 3 - CI/CD + Cloud Run + Final Polish
+# Day 3 - Prisma + CI/CD + Cloud Run + Edge Hardening + Final Polish
 
 ## Target outcome
 
 - GitHub Actions CI workflow exists
 - optional CD workflow exists
-- backend deploys to Cloud Run if time allows
-- Prisma schema exists
+- Prisma schema exists in-repo
+- backend deploys to Cloud Run
+- ingress posture is reviewed and tightened
 - architecture story is polished for interview
 
-## Step 1 - Add GitHub Actions CI
+## Step 1 - Write the Prisma schema
+
+Deliverables:
+
+- `schema.prisma` checked into the repo
+- datasource and generator configured
+- models cover the core operational entities
+- indexes and relationships match the documented migration path
+
+Important constraint:
+
+- do not wire Prisma into the running app unless there is clear spare time after ingress
+- do not provision Cloud SQL before the core demo story is safe
+
+Interview framing:
+
+“The schema is defined with Prisma. Swapping in a real Postgres connection is mostly Cloud SQL provisioning and `DATABASE_URL` configuration. I intentionally kept the demo runtime on in-memory repositories so I could preserve reliability while still defining the production data model.”
+
+## Step 2 - Add GitHub Actions CI
 
 On PR / push:
 
@@ -672,7 +766,7 @@ On PR / push:
 - build API
 - optionally build admin
 
-## Step 2 - Add CD workflow if realistic
+## Step 3 - Add CD workflow if realistic
 
 On push to main:
 
@@ -682,27 +776,80 @@ On push to main:
 
 If deployment automation becomes too costly in time, stop at CI and do manual Cloud Run deployment once.
 
-## Step 3 - Create Prisma schema
+## Step 4 - Lock down ingress
+
+Target:
+
+- remove public Cloud Run access
+- restrict ingress so traffic comes through the load balancer path
+- verify `/api` still works end to end
+- document the exact deployment command and settings used
+
+## Step 5 - Optional Cloudflare edge pass
+
+Only do this if the ingress work is already done.
+
+Candidate scope:
+
+- proxy the admin host through Cloudflare
+- enable WAF managed rules
+- confirm static asset caching behavior
+- leave API caching conservative
+
+## Step 6 - Document relational schema and Cloud SQL path
 
 Define models and relationships.
 Do not let full DB integration derail the demo.
 
-## Step 4 - Deploy API to Cloud Run
+Document:
 
-Aim for:
+- why Prisma is present now
+- why Cloud SQL is intentionally deferred
+- what environment and network work is still required for cutover
 
-- one backend service
-- environment variables configured
-- healthy startup
-- accessible public endpoint for demo if desired
-
-## Step 5 - Final polish
+## Step 7 - Final polish
 
 - route progress
 - event timeline
 - sync status visibility
 - architecture diagram
-- talking points for Docker / Cloud Run / modular monolith
+- talking points for Docker / Cloud Run / modular monolith / ingress / Cloudflare
+
+---
+
+## Action Items
+
+Priority 0:
+
+- write the Prisma schema now
+- keep it in-repo as a concrete artifact for the production data model
+- do not migrate the running demo to Cloud SQL before the interview
+
+Priority 1:
+
+- update Cloud Run deployment so the API is no longer publicly invokable
+- verify the GCP load balancer is the only public entry path for `/api`
+- fix the CD workflow so future deploys preserve the intended ingress posture
+- document the exact ingress and IAM settings used in the README or deployment notes
+
+Priority 2:
+
+- add one small geospatial library and ship one visible feature based on distance or proximity
+- prefer `geolib` for a lightweight frontend/mobile addition or `@turf/distance` for backend validation
+- log or display the computed distance so the feature is demoable
+
+Priority 3:
+
+- add only a narrow Cloudflare slice if time remains
+- start with proxy + WAF + caching for admin static assets
+- leave API caching conservative
+- do not spend time on advanced DNS or SSL redesign unless it is already mostly configured
+
+Priority 4:
+
+- keep interview wording precise until ingress is actually private
+- say “Cloud Run + load balancer path” instead of “locked down behind internal ingress” until verified
+- say “offline-capable queued sync POC” instead of “production-grade offline replay”
 
 ---
 

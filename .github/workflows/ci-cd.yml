@@ -11,6 +11,7 @@ env:
   REGION: us-central1
   SERVICE_NAME: ally-waste-api
   IMAGE_NAME: us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/ally-waste-api/api
+  CLOUD_RUN_INGRESS: internal-and-cloud-load-balancing
 
 jobs:
   ci:
@@ -74,5 +75,7 @@ jobs:
             --image $IMAGE_NAME \
             --region $REGION \
             --platform managed \
+            --ingress $CLOUD_RUN_INGRESS \
+            --no-default-url \
             --allow-unauthenticated \
             --set-env-vars="NODE_ENV=production"

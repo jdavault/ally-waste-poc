@@ -45,6 +45,13 @@ docker compose up --build
 ## ☁️ Deployment
 The backend is automatically deployed to **GCP Cloud Run** via GitHub Actions on every push to `main`.
 
+The intended production-style posture for this POC is:
+- Cloud Run ingress restricted to `internal-and-cloud-load-balancing`
+- the default `run.app` URL disabled
+- public traffic reaching the API only through the GCP HTTPS Load Balancer path
+
+This preserves a simple public `/api/*` path for the admin app without leaving the raw Cloud Run service directly exposed on its default URL.
+
 ## 🛡️ Production Readiness (Roadmap)
 While this POC uses a Global External Load Balancer for the demo, a production deployment would include:
 - **Cloudflare Edge**: WAF, Rate Limiting, and DDoS protection in front of the GCP Load Balancer.

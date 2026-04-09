@@ -1,0 +1,223 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// Mirrors the current in-memory domain model so the app can move to Postgres
+/// without reshaping the service layer first.
+
+enum RouteStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum RouteStopStatus {
+  PENDING
+  COMPLETED
+  MISSED
+  ISSUE
+}
+
+enum IssueCode {
+  NO_ACCESS
+  CONTAMINATED
+  OVERWEIGHT
+  DAMAGED_CONTAINER
+  OTHER
+}
+
+enum DayOfWeek {
+  MON
+  TUE
+  WED
+  THU
+  FRI
+  SAT
+  SUN
+}
+
+enum VehicleType {
+  TRUCK
+  VAN
+  CART
+}
+
+enum EventType {
+  ROUTE_STARTED
+  ROUTE_COMPLETED
+  STOP_COMPLETED
+  STOP_MISSED
+  STOP_ISSUE
+  LOCATION_PING
+  SYNC_BATCH
+}
+
+enum EntityType {
+  ROUTE
+  ROUTE_STOP
+  WORKER
+  PROPERTY
+}
+
+model Property {
+  id              String           @id
+  name            String
+  address         String
+  timezone        String
+  lat             Float
+  lng             Float
+  active          Boolean          @default(true)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  buildings       Building[]
+  pickupSchedules PickupSchedule[]
+  routes          Route[]
+
+  @@map("properties")
+}
+
+model Building {
+  id          String   @id
+  propertyId  String
+  name        String
+  accessNotes String
+  lat         Float
+  lng         Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  property    Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  units       Unit[]
+  routeStops  RouteStop[]
+
+  @@index([propertyId])
+  @@map("buildings")
+}
+
+model Unit {
+  id                 String      @id
+  buildingId         String
+  unitNumber         String
+  floor              Int
+  serviceNotes       String
+  pickupInstructions String
+  active             Boolean     @default(true)
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+  building           Building    @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+  routeStops         RouteStop[]
+
+  @@unique([buildingId, unitNumber])
+  @@index([buildingId])
+  @@map("units")
+}
+
+model PickupSchedule {
+  id                  String      @id
+  propertyId          String
+  daysOfWeek          DayOfWeek[]
+  timeWindowStart     String
+  timeWindowEnd       String
+  active              Boolean     @default(true)
+  specialInstructions String
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+  property            Property    @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId, active])
+  @@map("pickup_schedules")
+}
+
+model Worker {
+  id          String        @id
+  name        String
+  phone       String
+  vehicleType VehicleType
+  active      Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  routes      Route[]
+  vehiclePings VehiclePing[]
+
+  @@map("workers")
+}
+
+model Route {
+  id          String       @id
+  propertyId  String
+  workerId    String?
+  serviceDate DateTime
+  status      RouteStatus
+  startedAt   DateTime?
+  completedAt DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  property    Property     @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  worker      Worker?      @relation(fields: [workerId], references: [id], onDelete: SetNull)
+  routeStops  RouteStop[]
+  vehiclePings VehiclePing[]
+
+  @@index([workerId, serviceDate])
+  @@index([propertyId, serviceDate])
+  @@map("routes")
+}
+
+model RouteStop {
+  id          String          @id
+  routeId     String
+  buildingId  String
+  unitId      String
+  sequence    Int
+  status      RouteStopStatus
+  completedAt DateTime?
+  lat         Float?
+  lng         Float?
+  issueCode   IssueCode?
+  issueNotes  String?
+  photoUrl    String?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  route       Route           @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  building    Building        @relation(fields: [buildingId], references: [id], onDelete: Restrict)
+  unit        Unit            @relation(fields: [unitId], references: [id], onDelete: Restrict)
+
+  @@index([routeId, sequence])
+  @@index([buildingId])
+  @@index([unitId])
+  @@map("route_stops")
+}
+
+model VehiclePing {
+  id        String    @id
+  workerId  String
+  routeId   String?
+  timestamp DateTime
+  lat       Float
+  lng       Float
+  speed     Float?
+  heading   Float?
+  worker    Worker    @relation(fields: [workerId], references: [id], onDelete: Cascade)
+  route     Route?    @relation(fields: [routeId], references: [id], onDelete: SetNull)
+
+  @@index([workerId, timestamp])
+  @@index([routeId, timestamp(sort: Desc)])
+  @@map("vehicle_pings")
+}
+
+model EventLog {
+  id         String   @id
+  entityType EntityType
+  entityId   String
+  eventType  EventType
+  payload    Json
+  createdAt  DateTime @default(now())
+
+  @@index([entityType, entityId, createdAt(sort: Desc)])
+  @@index([eventType, createdAt(sort: Desc)])
+  @@map("event_log")
+}
