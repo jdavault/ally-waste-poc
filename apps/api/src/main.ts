@@ -4,30 +4,37 @@ import { AppModule } from './app.module';
 import { SwaggerBuilderModule } from './swagger/swagger-builder.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  console.log('Starting API bootstrap...');
+  try {
+    const app = await NestFactory.create(AppModule);
 
-  app.enableCors();
-  app.setGlobalPrefix('api');
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      transform: true,
-    }),
-  );
+    app.enableCors();
+    app.setGlobalPrefix('api');
+    app.useGlobalPipes(
+      new ValidationPipe({
+        whitelist: true,
+        transform: true,
+      }),
+    );
 
-  SwaggerBuilderModule.createSpec(app, {
-    title: 'Ally Waste API',
-    description: 'Valet trash and recycling logistics platform API',
-    version: '1.0',
-    path: 'spec',
-  });
+    SwaggerBuilderModule.createSpec(app, {
+      title: 'Ally Waste API',
+      description: 'Valet trash and recycling logistics platform API',
+      version: '1.0',
+      path: 'spec',
+    });
 
-  const port = process.env.PORT ?? 8080;
-  await app.listen(port, '0.0.0.0');
+    const port = Number(process.env.PORT) || 8080;
+    await app.listen(port, '0.0.0.0');
 
-  console.log(`API running on: http://0.0.0.0:${port}/api`);
-
-  console.log(`Health check:   http://localhost:${port}/api/health`);
-  console.log(`Swagger docs:   http://localhost:${port}/spec`);
+    console.log(`API is listening on 0.0.0.0:${port}`);
+    console.log(`Health check: http://localhost:${port}/api/health`);
+  } catch (error) {
+    console.error('Failed to start API:', error);
+    process.exit(1);
+  }
 }
-void bootstrap();
+bootstrap().catch((err) => {
+  console.error('Unhandled bootstrap error:', err);
+  process.exit(1);
+});

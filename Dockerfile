@@ -20,15 +20,19 @@ RUN npm run build -w @ally-waste/api
 # Stage 3: Final Production image
 FROM base AS runner
 ENV NODE_ENV=production
+# Default PORT for Cloud Run, can be overridden
 ENV PORT=8080
+
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/apps/api/package*.json ./apps/api/
 COPY --from=builder /app/packages/shared-types/package*.json ./packages/shared-types/
 COPY --from=builder /app/node_modules ./node_modules
-# Copy all of dist to preserve the internal structure NestJS created
-COPY --from=builder /app/apps/api/dist ./dist
+
+# Copy dist files preserving the workspace structure
+COPY --from=builder /app/apps/api/dist ./apps/api/dist
+COPY --from=builder /app/packages/shared-types/dist ./packages/shared-types/dist
 
 EXPOSE 8080
 
-# Use the actual deep path NestJS generated
-CMD ["node", "dist/apps/api/src/main"]
+# Run from the workspace-relative path
+CMD ["node", "apps/api/dist/apps/api/src/main"]
