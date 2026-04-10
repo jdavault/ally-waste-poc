@@ -8,6 +8,7 @@ export interface PendingAction {
   id: string;
   type: PendingActionType;
   stopId: string;
+  routeId?: string;
   timestamp: string;
   lat?: number;
   lng?: number;

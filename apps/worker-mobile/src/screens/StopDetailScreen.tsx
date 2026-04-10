@@ -101,6 +101,7 @@ export default function StopDetailScreen({ route, navigation }: any) {
       addAction({
         type,
         stopId,
+        routeId: stop?.routeId,
         timestamp: new Date().toISOString(),
         lat: location?.coords.latitude,
         lng: location?.coords.longitude,

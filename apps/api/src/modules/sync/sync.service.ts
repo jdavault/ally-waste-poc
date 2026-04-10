@@ -42,7 +42,13 @@ export class SyncService {
       EntityType.WORKER,
       dto.workerId,
       EventType.SYNC_BATCH,
-      { processed, failed, actionCount: dto.actions.length },
+      {
+        processed,
+        failed,
+        actionCount: dto.actions.length,
+        // If there's at least one action, associate this sync with that route for live dashboard updates
+        routeId: dto.actions[0]?.routeId,
+      },
     );
 
     return { processed, failed, errors };
