@@ -6,7 +6,10 @@ import { routes } from '../../seed/seed-data';
 @Injectable()
 export class RoutesRepository extends InMemoryRepository<Route> {
   constructor() {
-    super(routes);
+    // Stamp seed routes with today's UTC date at startup so the serviceDate
+    // always matches findTodayByWorkerId regardless of when the image was built.
+    const today = new Date().toISOString().split('T')[0];
+    super(routes.map(r => ({ ...r, serviceDate: today })));
   }
 
   findByWorkerId(workerId: string): Route[] {
