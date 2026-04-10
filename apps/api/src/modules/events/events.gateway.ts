@@ -15,7 +15,7 @@ import { EventLog, EntityType } from '@ally-waste/shared-types';
   cors: { origin: '*' },
 })
 export class RouteEventsGateway implements OnGatewayInit {
-  @WebSocketServer() server: Server;
+  @WebSocketServer() server!: Server;
   private readonly logger = new Logger(RouteEventsGateway.name);
 
   afterInit() {
