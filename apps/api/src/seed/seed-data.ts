@@ -53,6 +53,17 @@ export const properties: Property[] = [
     createdAt: '2026-02-01T00:00:00.000Z',
     updatedAt: '2026-02-01T00:00:00.000Z',
   },
+  {
+    id: 'prop-003',
+    name: 'Sunstone Village',
+    address: '1450 W Baseline Rd, Tempe, AZ 85283',
+    timezone: 'America/Phoenix',
+    lat: 33.3853,
+    lng: -111.9414,
+    active: true,
+    createdAt: '2026-03-01T00:00:00.000Z',
+    updatedAt: '2026-03-01T00:00:00.000Z',
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -103,6 +114,27 @@ export const buildings: Building[] = [
     createdAt: '2026-02-01T00:00:00.000Z',
     updatedAt: '2026-02-01T00:00:00.000Z',
   },
+  // Sunstone Village
+  {
+    id: 'bldg-005',
+    propertyId: 'prop-003',
+    name: 'Sunstone North',
+    accessNotes: 'Gate code: 1357. Service entrance on the north side.',
+    lat: 33.3856,
+    lng: -111.9410,
+    createdAt: '2026-03-01T00:00:00.000Z',
+    updatedAt: '2026-03-01T00:00:00.000Z',
+  },
+  {
+    id: 'bldg-006',
+    propertyId: 'prop-003',
+    name: 'Sunstone South',
+    accessNotes: 'Access through main lobby. Trash room on each floor.',
+    lat: 33.3849,
+    lng: -111.9418,
+    createdAt: '2026-03-01T00:00:00.000Z',
+    updatedAt: '2026-03-01T00:00:00.000Z',
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -142,13 +174,17 @@ function makeUnits(
 // Bldg B: 2 floors, 2 units each = 4 units
 // Tower 1: 3 floors, 2 units each = 6 units
 // Tower 2: 2 floors, 2 units each = 4 units
-// Total: 20 units
+// Sunstone North: 2 floors, 3 units each = 6 units
+// Sunstone South: 2 floors, 2 units each = 4 units
+// Total: 30 units
 
 export const units: Unit[] = [
-  ...makeUnits('bldg-001', 2, 3, 0), // unit-001 through unit-006
-  ...makeUnits('bldg-002', 2, 2, 6), // unit-007 through unit-010
+  ...makeUnits('bldg-001', 2, 3, 0),  // unit-001 through unit-006
+  ...makeUnits('bldg-002', 2, 2, 6),  // unit-007 through unit-010
   ...makeUnits('bldg-003', 3, 2, 10), // unit-011 through unit-016
   ...makeUnits('bldg-004', 2, 2, 16), // unit-017 through unit-020
+  ...makeUnits('bldg-005', 2, 3, 20), // unit-021 through unit-026
+  ...makeUnits('bldg-006', 2, 2, 26), // unit-027 through unit-030
 ];
 
 // Add variety to a few units
@@ -184,6 +220,17 @@ export const pickupSchedules: PickupSchedule[] = [
     specialInstructions: 'Tower 1 first. Use service elevator only.',
     createdAt: '2026-02-01T00:00:00.000Z',
     updatedAt: '2026-02-01T00:00:00.000Z',
+  },
+  {
+    id: 'sched-003',
+    propertyId: 'prop-003',
+    daysOfWeek: [DayOfWeek.MON, DayOfWeek.WED, DayOfWeek.FRI],
+    timeWindowStart: '06:30',
+    timeWindowEnd: '10:30',
+    active: true,
+    specialInstructions: 'North building first. Elevator access required for floors 2+.',
+    createdAt: '2026-03-01T00:00:00.000Z',
+    updatedAt: '2026-03-01T00:00:00.000Z',
   },
 ];
 
@@ -248,6 +295,17 @@ export const routes: Route[] = [
     createdAt: now,
     updatedAt: now,
   },
+  {
+    id: 'route-003',
+    propertyId: 'prop-003',
+    workerId: 'worker-003',
+    serviceDate: today,
+    status: RouteStatus.PENDING,
+    startedAt: null,
+    completedAt: null,
+    createdAt: now,
+    updatedAt: now,
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -305,7 +363,7 @@ export const routeStops: RouteStop[] = oakwoodUnits.map((u, i) => {
   };
 });
 
-// Route 2 (Riverside — Towers 1 & 2, 10 units) — all pending
+// Route 2 (Heritage Ranch — Towers 1 & 2, 10 units) — all pending
 const riversideUnits = units.filter(
   (u) => u.buildingId === 'bldg-003' || u.buildingId === 'bldg-004',
 );
@@ -314,6 +372,30 @@ routeStops.push(
   ...riversideUnits.map((u, i) => ({
     id: `stop-${String(i + 11).padStart(3, '0')}`,
     routeId: 'route-002',
+    buildingId: u.buildingId,
+    unitId: u.id,
+    sequence: i + 1,
+    status: RouteStopStatus.PENDING,
+    completedAt: null,
+    lat: null,
+    lng: null,
+    issueCode: null,
+    issueNotes: null,
+    photoUrl: null,
+    createdAt: now,
+    updatedAt: now,
+  })),
+);
+
+// Route 3 (Sunstone Village — North & South, 10 units) — all pending
+const sunstoneUnits = units.filter(
+  (u) => u.buildingId === 'bldg-005' || u.buildingId === 'bldg-006',
+);
+
+routeStops.push(
+  ...sunstoneUnits.map((u, i) => ({
+    id: `stop-${String(i + 21).padStart(3, '0')}`,
+    routeId: 'route-003',
     buildingId: u.buildingId,
     unitId: u.id,
     sequence: i + 1,
